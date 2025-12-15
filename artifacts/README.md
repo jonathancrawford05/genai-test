@@ -21,74 +21,8 @@ Extract every rule section from the homeowner rules manual.
 
 ---
 
-# ✅ **EF_2 — Multi-Step Question (Territory, Rate Change, GRG Difference)**
 
-This question requires **cross-document retrieval** and **multi-step reasoning**.
-
-### **How a human would solve it**
-
----
-
-### **Step 1 — Determine Territories (West vs. East of Nellis)**
-
-1. Open the PDF:
-   **(213128717-179157013)-MCY Rate Filing Data Summary - SFFC.pdf**
-
-2. Use the **territory definitions pages**:
-
-   * Page **21** → Territory **118** = “West of Nellis” portion of ZIP 89110
-   * Page **20** → Territory **117** = areas of 89110 *not* in 118 (i.e., east)
-
-### **Output:**
-
-West → 118
-East → 117
-
----
-
-### **Step 2 — Compare Proposed Comprehensive Rate Changes**
-
-1. In the *same PDF*, go to the **rate change exhibit** (Page 2).
-2. Identify Comprehensive rate changes:
-
-   * Territory 118 → **0.305%**
-   * Territory 117 → **–0.133%**
-
-### **Human conclusion:**
-
-0.305% is greater than –0.133%.
-
----
-
-### **Step 3 — Look Up Collision Rating Groups (GRG)**
-
-1. Open:
-   **(213128742-179157333)-2024 CW Rate Manual Pages Redlined.pdf**
-
-2. Look up the GRG for each motorcycle:
-
-   * Ducati Panigale V4 R → Page 11 → **GRG 051**
-   * Honda Grom ABS → Page 13 → **GRG 015**
-
----
-
-### **Step 4 — Perform Simple Arithmetic**
-
-Compute the difference:
-51 – 15 = **36**
-
-Check: Is 36 > 30?
-Yes.
-
----
-
-### **Final Human Answer**
-
-Both conditions are true → **Answer is Yes**.
-
----
-
-# ✅ **EF_3 — Calculate Hurricane Premium**
+# ✅ **EF_2 — Calculate Hurricane Premium**
 
 ### **Goal**
 

@@ -31,6 +31,5 @@ EF_1,List all rating plan rules,"* Limits of Liability and Coverage Relationship
 * Loss History Rating
 * Claims Free Discount
 * Underwriting Experience
-* Minimum Premium",2
-EF_2,"For a State Farm Fire & Casualty Company policyholder living in Zip Code 89110, does the resident living West of Nellis Boulevard face a higher proposed percentage rate change for Comprehensive coverage compared to a resident living East of Nellis Boulevard, and does the numeric difference between the Collision Rating Groups (GRG) of a 2023 Ducati Panigale V4 R and a 2023 Honda Grom ABS exceed 30 points?","Yes. A resident living West of Nellis Boulevard (Territory 118) faces a higher proposed Comprehensive rate change (0.305%) than a resident living East of Nellis Boulevard (Territory 117, -0.133%). Additionally, the difference between the Collision Rating Group of the Ducati Panigale V4 R (051) and the Honda Grom ABS (015) is 36, which exceeds 30 points.",1
-EF_3,"Using the Base Rate and the applicable Mandatory Hurricane Deductible Factor, calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood.",$604,2
+* Minimum Premium",1
+EF_2,"Using the Base Rate and the applicable Mandatory Hurricane Deductible Factor, calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood.",$604,1

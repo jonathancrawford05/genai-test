@@ -27,7 +27,7 @@ This test focuses on prototyping a solution. You are not expected to deliver pro
 
 Create a function that answers questions based on PDF documents. The function will receive a folder containing the documents and a specific question, and it should answer that question correctly. You may use any agentic design pattern of your choice.
 
-You will be given 3 questions and their expected answers.
+You will be given 2 questions and their expected answers.
 
 ### Updated Function Signature
 
@@ -48,7 +48,7 @@ Here’s an example of how you would call the function:
 ```python
 # Example 1
 question_1 = "List all rating plan rules"
-pdfs_folder_1 = "artifacts/2"  
+pdfs_folder_1 = "artifacts/1"  
 answer_1 = answer_pdf_question(question_1, pdfs_folder_1)
 ```
 
