@@ -109,10 +109,12 @@ class UltraLightProcessor:
         total_pages = len(reader.pages)
         chunks_added = 0
 
+        print(f"  Processing {total_pages} pages: ", end="", flush=True)
+
         for page_num, page in enumerate(reader.pages, start=1):
-            # Show progress every 10 pages
-            if page_num % 10 == 0:
-                print(f"    Page {page_num}/{total_pages}...", flush=True)
+            # Show page progress
+            if page_num % 5 == 0 or page_num == total_pages:
+                print(f"[p{page_num}]", end="", flush=True)
 
             try:
                 text = page.extract_text()
@@ -129,9 +131,10 @@ class UltraLightProcessor:
                 chunks_added += page_chunks
 
             except Exception as e:
-                print(f"    Warning: Page {page_num} failed: {e}")
+                print(f"\n    Warning: Page {page_num} failed: {e}")
                 continue
 
+        print()  # New line after processing
         return chunks_added
 
     def _store_page_chunks(
@@ -179,9 +182,17 @@ class UltraLightProcessor:
                     ids=[chunk_id],
                 )
                 chunks_stored += 1
+
+                # Show progress for every 5th chunk
+                if chunks_stored % 5 == 0:
+                    print(".", end="", flush=True)
+
             except Exception as e:
-                print(f"      Warning: Failed to store chunk: {e}")
+                print(f"\n      Warning: Failed to store chunk: {e}")
                 continue
+
+        if chunks_stored > 0:
+            print(f" {chunks_stored}", end="", flush=True)
 
         return chunks_stored
 
