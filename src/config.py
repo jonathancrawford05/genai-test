@@ -12,12 +12,12 @@ class PDFProcessingConfig:
     """Configuration for PDF processing."""
 
     # Batch processing
-    batch_size: int = 3  # Process N PDFs at a time to limit memory
+    batch_size: int = 1  # Process N PDFs at a time to limit memory (1 = safest)
     chunk_size: int = 1000  # Characters per chunk
     chunk_overlap: int = 200  # Overlap between chunks
 
     # Memory management
-    max_chunks_in_memory: int = 100  # Max chunks to hold before flushing to DB
+    max_chunks_in_memory: int = 50  # Max chunks to hold before flushing to DB
 
     # Text extraction
     extract_tables: bool = True

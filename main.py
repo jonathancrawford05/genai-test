@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 
 from src.config import AppConfig
 from src.pdf_processor import PDFProcessor
+from src.fast_pdf_processor import FastPDFProcessor
 from src.vector_store import VectorStore
 from src.rag_engine import RAGEngine
 
@@ -45,8 +46,8 @@ def index_pdfs(pdf_folder: str, config: AppConfig) -> VectorStore:
     print("INDEXING PDFs")
     print(f"{'=' * 60}\n")
 
-    # Initialize components
-    processor = PDFProcessor(
+    # Initialize components (use FastPDFProcessor for better performance)
+    processor = FastPDFProcessor(
         chunk_size=config.pdf_processing.chunk_size,
         chunk_overlap=config.pdf_processing.chunk_overlap,
         batch_size=config.pdf_processing.batch_size,

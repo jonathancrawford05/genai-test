@@ -1,29 +1,18 @@
 """
-Memory-efficient PDF processing with batch and streaming support.
+Fast PDF processing using pypdf (alternative to pdfplumber).
 """
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, List, Optional
+from typing import Iterator, List
 import gc
 
-import pdfplumber
+from pypdf import PdfReader
+
+from .pdf_processor import DocumentChunk
 
 
-@dataclass
-class DocumentChunk:
-    """Represents a chunk of text from a PDF document."""
-
-    text: str
-    metadata: dict
-
-    def __post_init__(self):
-        """Validate chunk."""
-        if not self.text or not self.text.strip():
-            raise ValueError("Chunk text cannot be empty")
-
-
-class PDFProcessor:
-    """Processes PDFs in batches with memory-efficient streaming."""
+class FastPDFProcessor:
+    """Faster PDF processor using pypdf instead of pdfplumber."""
 
     def __init__(
         self,
@@ -32,7 +21,7 @@ class PDFProcessor:
         batch_size: int = 3,
     ):
         """
-        Initialize PDF processor.
+        Initialize fast PDF processor.
 
         Args:
             chunk_size: Maximum characters per chunk
@@ -48,8 +37,6 @@ class PDFProcessor:
     ) -> Iterator[List[DocumentChunk]]:
         """
         Process all PDFs in a folder in batches.
-
-        Yields batches of chunks to avoid memory explosion.
 
         Args:
             folder_path: Path to folder containing PDFs
@@ -80,11 +67,12 @@ class PDFProcessor:
 
             for pdf_path in batch_files:
                 try:
+                    print(f"  Processing {pdf_path.name}...", end=" ", flush=True)
                     chunks = list(self._process_single_pdf(pdf_path))
                     batch_chunks.extend(chunks)
-                    print(f"  ✓ {pdf_path.name}: {len(chunks)} chunks")
+                    print(f"✓ {len(chunks)} chunks")
                 except Exception as e:
-                    print(f"  ✗ {pdf_path.name}: Error - {str(e)}")
+                    print(f"✗ Error: {str(e)}")
                     continue
 
             yield batch_chunks
@@ -95,7 +83,7 @@ class PDFProcessor:
 
     def _process_single_pdf(self, pdf_path: Path) -> Iterator[DocumentChunk]:
         """
-        Process a single PDF file and yield chunks.
+        Process a single PDF file using pypdf (faster).
 
         Args:
             pdf_path: Path to PDF file
@@ -103,19 +91,13 @@ class PDFProcessor:
         Yields:
             DocumentChunk objects
         """
-        print(f"    Opening {pdf_path.name}...", end=" ", flush=True)
+        reader = PdfReader(pdf_path)
+        total_pages = len(reader.pages)
 
-        with pdfplumber.open(pdf_path) as pdf:
-            total_pages = len(pdf.pages)
-            print(f"({total_pages} pages)", flush=True)
-
-            for page_num, page in enumerate(pdf.pages, start=1):
-                # Show progress for every 10 pages
-                if page_num % 10 == 0 or page_num == total_pages:
-                    print(f"      Processing page {page_num}/{total_pages}...", flush=True)
-
-                # Extract text (simplified - no tables to speed up)
-                text = page.extract_text(layout=False)  # Faster extraction
+        for page_num, page in enumerate(reader.pages, start=1):
+            try:
+                # Extract text (much faster than pdfplumber)
+                text = page.extract_text()
                 if not text or not text.strip():
                     continue
 
@@ -129,6 +111,11 @@ class PDFProcessor:
                     }
 
                     yield DocumentChunk(text=chunk_text, metadata=metadata)
+
+            except Exception as e:
+                # Skip problematic pages
+                print(f"\n      Warning: Page {page_num} failed: {e}")
+                continue
 
     def _chunk_text(self, text: str) -> Iterator[str]:
         """

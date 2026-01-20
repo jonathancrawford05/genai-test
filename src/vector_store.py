@@ -52,7 +52,7 @@ class VectorStore:
             metadata={"description": "PDF document chunks with embeddings"},
         )
 
-    def add_chunks(self, chunks: List[DocumentChunk], batch_size: int = 50) -> int:
+    def add_chunks(self, chunks: List[DocumentChunk], batch_size: int = 25) -> int:
         """
         Add chunks to the vector store in batches.
 
@@ -67,10 +67,14 @@ class VectorStore:
             return 0
 
         total_added = 0
+        num_batches = (len(chunks) + batch_size - 1) // batch_size
 
         # Process in smaller batches to control memory
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i : i + batch_size]
+            batch_num = (i // batch_size) + 1
+
+            print(f"    Embedding batch {batch_num}/{num_batches} ({len(batch)} chunks)...", end=" ", flush=True)
 
             # Extract texts and metadata
             texts = [chunk.text for chunk in batch]
@@ -98,6 +102,7 @@ class VectorStore:
             )
 
             total_added += len(batch)
+            print("✓")
 
             # Clean up
             del embeddings
