@@ -33,9 +33,11 @@ def analyze_pdf(pdf_path: str):
             num_chunks = 1
         else:
             start = 0
-            while start < len(text):
+            prev_start = -1
+            while start < len(text) and start != prev_start:
                 num_chunks += 1
                 end = min(start + chunk_size, len(text))
+                prev_start = start
                 start = end - overlap
                 if start >= len(text):
                     break

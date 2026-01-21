@@ -258,8 +258,9 @@ class UltraLightProcessor:
         start = 0
         chunks_created = 0
         max_chunks_per_page = 50  # Safety limit
+        prev_start = -1
 
-        while start < len(text):
+        while start < len(text) and start != prev_start:
             # Safety check
             if chunks_created >= max_chunks_per_page:
                 print(f"\n    WARNING: Hit chunk limit ({max_chunks_per_page}) for this page. "
@@ -283,13 +284,12 @@ class UltraLightProcessor:
                 yield chunk
                 chunks_created += 1
 
-            # Move with overlap
-            new_start = end - self.chunk_overlap
-            if new_start <= start:  # Prevent getting stuck
-                new_start = start + self.chunk_size - self.chunk_overlap
+            # Move with overlap - track previous position to detect infinite loops
+            prev_start = start
+            start = end - self.chunk_overlap
 
-            start = new_start
-            if start >= len(text):
+            # If we're not making progress or past the end, stop
+            if start <= prev_start or start >= len(text):
                 break
 
     def query(self, query_text: str, top_k: int = 5):
