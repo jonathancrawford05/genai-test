@@ -256,7 +256,16 @@ class UltraLightProcessor:
             return
 
         start = 0
+        chunks_created = 0
+        max_chunks_per_page = 50  # Safety limit
+
         while start < len(text):
+            # Safety check
+            if chunks_created >= max_chunks_per_page:
+                print(f"\n    WARNING: Hit chunk limit ({max_chunks_per_page}) for this page. "
+                      f"Text length: {len(text)}. Skipping remainder.", flush=True)
+                break
+
             end = min(start + self.chunk_size, len(text))
             chunk = text[start:end]
 
@@ -272,10 +281,15 @@ class UltraLightProcessor:
 
             if chunk.strip():
                 yield chunk
+                chunks_created += 1
 
             # Move with overlap
-            start = end - self.chunk_overlap
-            if start < 0 or start >= len(text):
+            new_start = end - self.chunk_overlap
+            if new_start <= start:  # Prevent getting stuck
+                new_start = start + self.chunk_size - self.chunk_overlap
+
+            start = new_start
+            if start >= len(text):
                 break
 
     def query(self, query_text: str, top_k: int = 5):
