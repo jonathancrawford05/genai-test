@@ -23,8 +23,9 @@ class UltraLightProcessor:
         self,
         persist_directory: str = "./chroma_db",
         collection_name: str = "pdf_documents",
-        chunk_size: int = 1000,
+        chunk_size: int = 2000,  # Larger chunks = fewer total chunks
         chunk_overlap: int = 200,
+        batch_size: int = 20,  # Add chunks in batches, not one-by-one
     ):
         """
         Initialize processor.
@@ -39,6 +40,7 @@ class UltraLightProcessor:
         self.collection_name = collection_name
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.batch_size = batch_size
 
         # Initialize ChromaDB with default embedding function
         print("Initializing ChromaDB...")
@@ -97,7 +99,7 @@ class UltraLightProcessor:
 
     def _process_single_pdf(self, pdf_path: Path) -> int:
         """
-        Process one PDF, storing chunks immediately (no accumulation).
+        Process one PDF with batched additions to ChromaDB.
 
         Args:
             pdf_path: Path to PDF file
@@ -108,6 +110,11 @@ class UltraLightProcessor:
         reader = PdfReader(pdf_path)
         total_pages = len(reader.pages)
         chunks_added = 0
+
+        # Batch buffer
+        batch_docs = []
+        batch_metas = []
+        batch_ids = []
 
         print(f"  Processing {total_pages} pages: ", end="", flush=True)
 
@@ -121,23 +128,64 @@ class UltraLightProcessor:
                 if not text or not text.strip():
                     continue
 
-                # Process and store chunks immediately
-                page_chunks = self._store_page_chunks(
-                    text=text,
-                    source_file=pdf_path.name,
-                    page_number=page_num,
-                    total_pages=total_pages,
-                )
-                chunks_added += page_chunks
+                # Collect chunks for batching
+                for chunk_idx, chunk_text in enumerate(self._chunk_text(text)):
+                    if not chunk_text.strip():
+                        continue
+
+                    batch_docs.append(chunk_text)
+                    batch_metas.append({
+                        "source_file": pdf_path.name,
+                        "page_number": page_num,
+                        "total_pages": total_pages,
+                        "chunk_index": chunk_idx,
+                    })
+                    batch_ids.append(f"{pdf_path.name}_p{page_num}_{chunk_idx}")
+
+                    # Flush batch when it reaches batch_size
+                    if len(batch_docs) >= self.batch_size:
+                        self._flush_batch(batch_docs, batch_metas, batch_ids)
+                        chunks_added += len(batch_docs)
+                        print(".", end="", flush=True)
+                        batch_docs = []
+                        batch_metas = []
+                        batch_ids = []
 
             except Exception as e:
                 print(f"\n    Warning: Page {page_num} failed: {e}")
                 continue
 
-        print()  # New line after processing
+        # Flush remaining chunks
+        if batch_docs:
+            self._flush_batch(batch_docs, batch_metas, batch_ids)
+            chunks_added += len(batch_docs)
+            print(".", end="", flush=True)
+
+        print(f" {chunks_added} chunks")
         return chunks_added
 
-    def _store_page_chunks(
+    def _flush_batch(self, docs: list, metas: list, ids: list):
+        """
+        Flush a batch of chunks to ChromaDB.
+
+        Args:
+            docs: List of document texts
+            metas: List of metadata dicts
+            ids: List of IDs
+        """
+        if not docs:
+            return
+
+        try:
+            self.collection.add(
+                documents=docs,
+                metadatas=metas,
+                ids=ids,
+            )
+        except Exception as e:
+            print(f"\n    Warning: Batch flush failed: {e}")
+
+    def _old_store_page_chunks(
         self,
         text: str,
         source_file: str,

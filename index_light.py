@@ -17,12 +17,13 @@ def main():
     print("(Using ChromaDB's default embedding function)")
     print("=" * 60)
 
-    # Initialize processor
+    # Initialize processor (larger chunks, batched additions)
     processor = UltraLightProcessor(
         persist_directory="./chroma_db_light",
         collection_name="pdf_documents_light",
-        chunk_size=1000,
+        chunk_size=2000,  # Larger chunks = fewer total chunks
         chunk_overlap=200,
+        batch_size=20,  # Add 20 chunks at a time (much faster)
     )
 
     # Check if already indexed
