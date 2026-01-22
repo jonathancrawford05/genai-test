@@ -3,8 +3,8 @@
 FIXED experimentation harness that actually uses different embeddings.
 
 Properly supports:
-- onnx: ChromaDB default ONNX embeddings
-- sentence-transformers: PyTorch-based semantic embeddings
+- onnx: ChromaDB default ONNX embeddings (all-MiniLM-L6-v2, 79MB)
+- nomic-embed-text: Ollama embeddings (RAG-optimized, 274MB, different architecture)
 """
 import csv
 import json
@@ -16,7 +16,7 @@ from typing import List, Dict
 import ollama
 
 from src.ultra_light_processor import UltraLightProcessor
-from src.sentence_transformer_processor import SentenceTransformerProcessor
+from src.ollama_embedding_processor import OllamaEmbeddingProcessor
 
 
 @dataclass
@@ -66,7 +66,7 @@ class FixedRAGHarness:
 
             # FIXED: Actually switch based on embedding type
             if embedding_model == "onnx":
-                print("Using: ChromaDB ONNX embeddings (lightweight)")
+                print("Using: ChromaDB ONNX embeddings (all-MiniLM-L6-v2, 79MB)")
                 processor = UltraLightProcessor(
                     persist_directory=f"./chroma_db_onnx",
                     collection_name=f"pdf_docs_{key}",
@@ -74,25 +74,20 @@ class FixedRAGHarness:
                     chunk_overlap=chunk_overlap,
                 )
 
-            elif embedding_model == "sentence-transformers":
-                print("Using: Sentence-Transformers PyTorch embeddings (semantic)")
-                processor = SentenceTransformerProcessor(
-                    persist_directory=f"./chroma_db_sentence_transformers",
+            elif embedding_model == "nomic-embed-text":
+                print("Using: Ollama nomic-embed-text embeddings (RAG-optimized, 274MB)")
+                processor = OllamaEmbeddingProcessor(
+                    persist_directory=f"./chroma_db_ollama",
                     collection_name=f"pdf_docs_{key}",
-                    model_name="all-MiniLM-L6-v2",
+                    model_name="nomic-embed-text",
                     chunk_size=chunk_size,
                     chunk_overlap=chunk_overlap,
                 )
 
             else:
-                # For nomic-embed-text, we'd need Ollama integration
-                # For now, fall back to ONNX with a warning
-                print(f"⚠️  {embedding_model} not fully implemented, using ONNX")
-                processor = UltraLightProcessor(
-                    persist_directory=f"./chroma_db_{embedding_model.replace(':', '_')}",
-                    collection_name=f"pdf_docs_{key}",
-                    chunk_size=chunk_size,
-                    chunk_overlap=chunk_overlap,
+                raise ValueError(
+                    f"Unknown embedding model: {embedding_model}\n"
+                    f"Supported: 'onnx', 'nomic-embed-text'"
                 )
 
             # Index if needed
@@ -102,7 +97,7 @@ class FixedRAGHarness:
                 total = processor.process_folder(self.pdf_folder)
                 elapsed = time.time() - start
                 print(f"✓ Indexed {total} chunks in {elapsed:.1f}s")
-                print(f"  (Indexing time is a good indicator - sentence-transformers should be 2-3x slower)")
+                print(f"  (Indexing time is a good indicator - nomic-embed-text may be slower than ONNX)")
             else:
                 print(f"✓ Using existing index: {processor.count()} chunks")
 
@@ -298,8 +293,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="FIXED RAG Experimentation Harness")
-    parser.add_argument('--embeddings', nargs='+', default=['onnx', 'sentence-transformers'],
-                       help='Embedding models: onnx, sentence-transformers')
+    parser.add_argument('--embeddings', nargs='+', default=['onnx', 'nomic-embed-text'],
+                       help='Embedding models: onnx, nomic-embed-text')
     parser.add_argument('--llms', nargs='+', default=['phi3', 'llama3.2'],
                        help='LLM models')
     parser.add_argument('--top-k', nargs='+', type=int, default=[5],
@@ -328,9 +323,9 @@ def main():
     print(f"  Results: {args.output_csv}")
     print(f"{'=' * 60}")
     print("\nNow check:")
-    print("1. Indexing times - sentence-transformers should be 2-3x slower")
+    print("1. Indexing times - ONNX vs nomic-embed-text may differ")
     print("2. F1 scores - should differ if embeddings retrieve different chunks")
-    print("3. chunk_X_source columns - are they different across embeddings?")
+    print("3. chunk_X_source columns - compare retrieval across different embedding models")
 
 
 if __name__ == "__main__":

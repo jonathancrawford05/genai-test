@@ -6,11 +6,12 @@ Clear explanation of how document retrieval works in each configuration.
 
 | Component | Method | Description |
 |-----------|--------|-------------|
-| **ONNX (UltraLightProcessor)** | Semantic similarity | ONNX-optimized embeddings, cosine distance |
-| **Sentence-Transformers** | Semantic similarity | PyTorch embeddings, cosine distance |
-| **nomic-embed-text** | Semantic similarity | Ollama embeddings, cosine distance |
+| **ONNX (UltraLightProcessor)** | Semantic similarity | ONNX-optimized all-MiniLM-L6-v2, 79MB, cosine distance |
+| **nomic-embed-text (OllamaEmbeddingProcessor)** | Semantic similarity | Ollama embeddings, 274MB, RAG-optimized, cosine distance |
 
 **None of these use BM25 or keyword matching!**
+
+**Note:** Sentence-Transformers was removed from experiments as it's redundant with ONNX (same underlying model, just PyTorch vs ONNX runtime).
 
 ## Detailed Explanation
 
@@ -73,17 +74,34 @@ results = processor.query("What are the rules?", top_k=5)
 - Higher memory (1-2GB during indexing)
 - Virtually identical retrieval quality
 
-### 3. nomic-embed-text (Planned)
+### 3. nomic-embed-text (OllamaEmbeddingProcessor) ✅
 
 **What it is:**
-- Ollama's embedding model
+- Ollama's embedding model (274MB)
 - Optimized specifically for RAG tasks
 - Different architecture from MiniLM
+- Now integrated in `fixed_experiment.py`
+
+**How it works:**
+```python
+processor = OllamaEmbeddingProcessor(model_name="nomic-embed-text", ...)
+results = processor.query("What are the rules?", top_k=5)
+```
+
+1. **Text → Vector**: Query text converted via Ollama API
+2. **Compare**: Cosine distance in embedding space
+3. **Rank**: By similarity
+4. **Return**: Top K chunks
 
 **Retrieval method:** **Semantic similarity**
-- Uses different embedding model
+- Uses different embedding model than ONNX
 - May produce different rankings than MiniLM
 - Still cosine distance in vector space
+
+**Why use this over ONNX:**
+- Different model architecture (not just runtime difference)
+- Specifically optimized for RAG retrieval tasks
+- May retrieve more relevant chunks for question-answering
 
 ## NOT Used: BM25
 
@@ -125,21 +143,25 @@ With `fixed_experiment.py`:
 
 **ONNX indexing:**
 ```
+Using: ChromaDB ONNX embeddings (all-MiniLM-L6-v2, 79MB)
 Indexing PDFs...
 ✓ Indexed 1523 chunks in 62.3s
 ```
 
-**Sentence-Transformers indexing:**
+**nomic-embed-text indexing:**
 ```
-Loading all-MiniLM-L6-v2...
+Using: Ollama nomic-embed-text embeddings (RAG-optimized, 274MB)
+Testing Ollama connection with nomic-embed-text...
+✓ Ollama connected (dim=768)
 Indexing PDFs...
-✓ Indexed 1523 chunks in 145.7s  ← 2-3x slower!
+✓ Indexed 1523 chunks in XX.Xs  ← May differ from ONNX
 ```
 
 **F1 Scores:**
-- May still be similar (same underlying model)
-- But chunk rankings might differ slightly
-- Check `chunk_X_source` columns to verify
+- SHOULD differ (different model architectures!)
+- ONNX uses all-MiniLM-L6-v2 (384 dims)
+- nomic-embed-text uses different architecture (768 dims, RAG-optimized)
+- Check `chunk_X_source` columns to see if retrieval differs
 
 ## Testing the Fix
 
@@ -147,7 +169,7 @@ Indexing PDFs...
 
 ```bash
 python fixed_experiment.py \
-  --embeddings onnx sentence-transformers \
+  --embeddings onnx nomic-embed-text \
   --llms phi3 llama3.2 \
   --top-k 5
 ```
@@ -157,80 +179,84 @@ python fixed_experiment.py \
 **1. Indexing Time**
 ```
 Setting up embedding: onnx
-...
+Using: ChromaDB ONNX embeddings (all-MiniLM-L6-v2, 79MB)
 ✓ Indexed 1523 chunks in 62.3s
 
-Setting up embedding: sentence-transformers
-Loading all-MiniLM-L6-v2...  ← You'll see PyTorch loading
-...
-✓ Indexed 1523 chunks in 147.2s  ← Should be 2-3x slower
+Setting up embedding: nomic-embed-text
+Using: Ollama nomic-embed-text embeddings (RAG-optimized, 274MB)
+Testing Ollama connection with nomic-embed-text...
+✓ Ollama connected (dim=768)
+✓ Indexed 1523 chunks in XX.Xs  ← Timing may differ
 ```
 
 **2. Memory Usage**
 - ONNX: ~500MB peak
-- Sentence-transformers: ~1.5GB peak (PyTorch + model)
+- nomic-embed-text: ~800MB-1GB peak (Ollama + embeddings)
 
 **3. CSV Columns**
 Open `experiment_fixed_detailed.csv`:
 ```
 embedding_model,chunk_1_source,chunk_2_source,...
 onnx,file1.pdf (p12),file2.pdf (p5),...
-sentence-transformers,file1.pdf (p12),file2.pdf (p5),...
-                      ↑ Check if these differ!
+nomic-embed-text,file3.pdf (p8),file1.pdf (p15),...
+                 ↑ These SHOULD differ!
 ```
 
-**If chunks are identical:**
-- ONNX and PyTorch implementations are converging
-- Same model → same embeddings → same rankings
-- This is actually expected!
+**If chunks differ (expected):**
+- Different model architectures (384 vs 768 dims)
+- Different training objectives (general vs RAG-optimized)
+- This means nomic-embed-text may retrieve different (hopefully better) chunks!
 
-**If chunks differ:**
-- Different runtime producing slightly different rankings
-- Or numerical precision differences
-- Would be interesting to investigate further
+**If chunks are identical (unexpected):**
+- Would indicate both models rank chunks identically
+- Unlikely given different architectures
+- Worth investigating if this happens
 
 ## Expected Results
 
-### Likely Scenario
+### ONNX vs nomic-embed-text Comparison
 
-ONNX and sentence-transformers produce **very similar** results because:
-1. Same underlying model (all-MiniLM-L6-v2)
-2. Same embedding dimension (384)
-3. Same distance metric (cosine)
-4. Just different runtime (ONNX vs PyTorch)
+These should produce **different** results because:
 
-**This means:** For most purposes, ONNX is sufficient!
-- Faster
-- Less memory
-- Same quality
+**ONNX (all-MiniLM-L6-v2):**
+1. General-purpose sentence embedding model
+2. 384-dimensional embeddings
+3. Trained on diverse text similarity tasks
+4. Fast, lightweight (79MB)
 
-### When Sentence-Transformers Matters
+**nomic-embed-text:**
+1. **Different architecture** (not just runtime)
+2. **768-dimensional embeddings** (2x larger)
+3. **RAG-optimized** training objective
+4. Designed specifically for retrieval tasks
+5. Slightly heavier (274MB)
 
-Use sentence-transformers if:
-- You want to fine-tune the model on your data
-- You need different models (mpnet, instructor, etc.)
-- You're doing research comparing architectures
+**This means:** Results SHOULD differ!
+- Different chunks may be retrieved
+- F1 scores may differ
+- One may outperform the other for RAG tasks
 
-For production with off-the-shelf models: **ONNX is better**.
+### When to Use Each
 
-## What About nomic-embed-text?
+**Use ONNX if:**
+- You need maximum speed and minimum memory
+- General semantic similarity is sufficient
+- 384 dimensions provide enough granularity
 
-**This one SHOULD be different:**
-- Different model architecture
-- Optimized specifically for RAG
-- May rank chunks differently
+**Use nomic-embed-text if:**
+- You want embeddings optimized for retrieval
+- Higher dimensional space may help
+- You're okay with slightly higher memory usage
+- You want to test if RAG-specific training helps
 
-**To test:**
-- Need to integrate Ollama embeddings
-- Compare against ONNX/sentence-transformers
-- See if RAG-specific model helps
+**Test both!** That's what the experimentation harness is for.
 
 ## Summary
 
 **Current implementations:**
-1. ✅ **ONNX**: Semantic similarity, fast, low memory
-2. ✅ **Sentence-Transformers**: Semantic similarity, slower, higher memory
-3. ⚠️ **nomic-embed-text**: Needs integration
+1. ✅ **ONNX (UltraLightProcessor)**: Semantic similarity, all-MiniLM-L6-v2, 79MB, 384 dims
+2. ✅ **nomic-embed-text (OllamaEmbeddingProcessor)**: Semantic similarity, RAG-optimized, 274MB, 768 dims
+3. ❌ **Sentence-Transformers**: Removed (redundant with ONNX - same model, different runtime)
 
 **Retrieval method (all):** **Semantic similarity** via embeddings + cosine distance
 
@@ -238,6 +264,12 @@ For production with off-the-shelf models: **ONNX is better**.
 
 **Bug identified:** ✅ Fixed in `fixed_experiment.py`
 
-**What changed:** Script now properly swaps between ONNX and PyTorch embeddings
+**What changed:**
+- Script now properly swaps between embedding types
+- Removed redundant sentence-transformers
+- Added Ollama nomic-embed-text integration
 
-**How to verify:** Check indexing times (2-3x difference) and chunk sources in CSV
+**How to verify:**
+- Check indexing times (may differ between ONNX and Ollama)
+- Compare chunk sources in CSV (should differ - different models!)
+- Compare F1 scores (may differ - RAG-optimized vs general-purpose)
