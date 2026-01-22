@@ -39,7 +39,8 @@ chroma_db/
 
 # Jupyter
 .ipynb_checkpoints
-*.ipynb
+# Allow experiment notebook
+!experiment_notebook.ipynb
 
 # IDE
 .vscode/
