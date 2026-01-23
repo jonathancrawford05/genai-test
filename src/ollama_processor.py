@@ -133,3 +133,29 @@ class OllamaProcessor(BasePDFProcessor):
 
         except Exception as e:
             print(f"\n    Warning: Batch add failed: {e}")
+
+    def query(self, query_text: str, top_k: int = 5):
+        """
+        Query collection with Ollama-generated embedding.
+
+        Must override base class because Ollama collections require
+        embeddings to be generated via Ollama API, not ChromaDB default.
+
+        Args:
+            query_text: Query string
+            top_k: Number of results
+
+        Returns:
+            Query results from ChromaDB
+        """
+        # Generate embedding for query using Ollama
+        response = ollama.embeddings(model=self.model_name, prompt=query_text)
+        query_embedding = response['embedding']
+
+        # Query with pre-computed embedding
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+        )
+        return results
+
