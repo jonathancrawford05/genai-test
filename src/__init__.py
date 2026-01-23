@@ -1,20 +1,12 @@
 """
 Memory-efficient RAG pipeline for PDF extraction.
 """
-from .config import AppConfig, PDFProcessingConfig, VectorStoreConfig, RAGConfig
-from .pdf_processor import PDFProcessor, DocumentChunk
-from .fast_pdf_processor import FastPDFProcessor
-from .vector_store import VectorStore
-from .rag_engine import RAGEngine
+from .base_processor import BasePDFProcessor
+from .onnx_processor import ONNXProcessor
+from .ollama_processor import OllamaProcessor
 
 __all__ = [
-    "AppConfig",
-    "PDFProcessingConfig",
-    "VectorStoreConfig",
-    "RAGConfig",
-    "PDFProcessor",
-    "FastPDFProcessor",
-    "DocumentChunk",
-    "VectorStore",
-    "RAGEngine",
+    "BasePDFProcessor",
+    "ONNXProcessor",
+    "OllamaProcessor",
 ]

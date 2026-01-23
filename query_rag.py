@@ -18,10 +18,10 @@ import os
 import argparse
 from dotenv import load_dotenv
 
-from src.ultra_light_processor import UltraLightProcessor
+from src.onnx_processor import ONNXProcessor
 
 
-def answer_with_ollama(question: str, processor: UltraLightProcessor, model: str, top_k: int):
+def answer_with_ollama(question: str, processor: ONNXProcessor, model: str, top_k: int):
     """Answer using Ollama."""
     import ollama
 
@@ -41,7 +41,7 @@ def answer_with_ollama(question: str, processor: UltraLightProcessor, model: str
     return response["message"]["content"].strip(), extract_sources(results)
 
 
-def answer_with_openai(question: str, processor: UltraLightProcessor, model: str, top_k: int):
+def answer_with_openai(question: str, processor: ONNXProcessor, model: str, top_k: int):
     """Answer using OpenAI."""
     from openai import OpenAI
 
@@ -63,7 +63,7 @@ def answer_with_openai(question: str, processor: UltraLightProcessor, model: str
     return response.choices[0].message.content.strip(), extract_sources(results)
 
 
-def answer_with_anthropic(question: str, processor: UltraLightProcessor, model: str, top_k: int):
+def answer_with_anthropic(question: str, processor: ONNXProcessor, model: str, top_k: int):
     """Answer using Anthropic."""
     from anthropic import Anthropic
 
@@ -162,7 +162,7 @@ def main():
     question = " ".join(args.question) if args.question else input("Enter your question: ")
 
     # Initialize processor
-    processor = UltraLightProcessor(
+    processor = ONNXProcessor(
         persist_directory="./chroma_db_light",
         collection_name="pdf_documents_light",
     )

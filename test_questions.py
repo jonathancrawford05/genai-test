@@ -8,10 +8,10 @@ import time
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from src.ultra_light_processor import UltraLightProcessor
+from src.onnx_processor import ONNXProcessor
 
 
-def answer_question_with_llm(question: str, processor: UltraLightProcessor, client: OpenAI, top_k: int = 5) -> dict:
+def answer_question_with_llm(question: str, processor: ONNXProcessor, client: OpenAI, top_k: int = 5) -> dict:
     """Answer a question using RAG with OpenAI."""
     # Retrieve relevant chunks
     results = processor.query(question, top_k=top_k)
@@ -75,7 +75,7 @@ def main():
         sys.exit(1)
 
     # Initialize
-    processor = UltraLightProcessor(
+    processor = ONNXProcessor(
         persist_directory="./chroma_db_light",
         collection_name="pdf_documents_light",
     )

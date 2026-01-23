@@ -5,12 +5,12 @@ RAG system with Ollama (local LLM) using the ultra-light database.
 import sys
 import ollama
 
-from src.ultra_light_processor import UltraLightProcessor
+from src.onnx_processor import ONNXProcessor
 
 
 def answer_question_with_ollama(
     question: str,
-    processor: UltraLightProcessor,
+    processor: ONNXProcessor,
     model: str = "llama3.2",
     top_k: int = 5
 ) -> dict:
@@ -120,7 +120,7 @@ def main():
             question = " ".join(args)
 
     # Initialize processor with existing database
-    processor = UltraLightProcessor(
+    processor = ONNXProcessor(
         persist_directory="./chroma_db_light",
         collection_name="pdf_documents_light",
     )

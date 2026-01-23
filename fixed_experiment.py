@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-FIXED experimentation harness that actually uses different embeddings.
+RAG experimentation harness with refactored processor architecture.
 
-Properly supports:
-- onnx: ChromaDB default ONNX embeddings (all-MiniLM-L6-v2, 79MB)
-- nomic-embed-text: Ollama embeddings (RAG-optimized, 274MB, different architecture)
+Supports:
+- onnx: ChromaDB ONNX embeddings (all-MiniLM-L6-v2, 79MB, 384 dims)
+- ollama: Ollama embeddings (nomic-embed-text, 274MB, 768 dims, RAG-optimized)
 """
 import csv
 import json
@@ -15,8 +15,8 @@ from dataclasses import dataclass, asdict, field
 from typing import List, Dict
 import ollama
 
-from src.ultra_light_processor import UltraLightProcessor
-from src.ollama_embedding_processor import OllamaEmbeddingProcessor
+from src.onnx_processor import ONNXProcessor
+from src.ollama_processor import OllamaProcessor
 
 
 @dataclass
@@ -64,19 +64,19 @@ class FixedRAGHarness:
             print(f"Setting up embedding: {embedding_model}")
             print(f"{'=' * 60}")
 
-            # FIXED: Actually switch based on embedding type
+            # Switch based on embedding type
             if embedding_model == "onnx":
-                print("Using: ChromaDB ONNX embeddings (all-MiniLM-L6-v2, 79MB)")
-                processor = UltraLightProcessor(
+                print("Using: ONNX embeddings (all-MiniLM-L6-v2, 79MB, 384 dims)")
+                processor = ONNXProcessor(
                     persist_directory=f"./chroma_db_onnx",
                     collection_name=f"pdf_docs_{key}",
                     chunk_size=chunk_size,
                     chunk_overlap=chunk_overlap,
                 )
 
-            elif embedding_model == "nomic-embed-text":
-                print("Using: Ollama nomic-embed-text embeddings (RAG-optimized, 274MB)")
-                processor = OllamaEmbeddingProcessor(
+            elif embedding_model == "ollama":
+                print("Using: Ollama embeddings (nomic-embed-text, 274MB, 768 dims, RAG-optimized)")
+                processor = OllamaProcessor(
                     persist_directory=f"./chroma_db_ollama",
                     collection_name=f"pdf_docs_{key}",
                     model_name="nomic-embed-text",
@@ -87,7 +87,7 @@ class FixedRAGHarness:
             else:
                 raise ValueError(
                     f"Unknown embedding model: {embedding_model}\n"
-                    f"Supported: 'onnx', 'nomic-embed-text'"
+                    f"Supported: 'onnx', 'ollama'"
                 )
 
             # Index if needed
@@ -292,9 +292,9 @@ class FixedRAGHarness:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="FIXED RAG Experimentation Harness")
-    parser.add_argument('--embeddings', nargs='+', default=['onnx', 'nomic-embed-text'],
-                       help='Embedding models: onnx, nomic-embed-text')
+    parser = argparse.ArgumentParser(description="RAG Experimentation Harness")
+    parser.add_argument('--embeddings', nargs='+', default=['onnx', 'ollama'],
+                       help='Embedding models: onnx, ollama')
     parser.add_argument('--llms', nargs='+', default=['phi3', 'llama3.2'],
                        help='LLM models')
     parser.add_argument('--top-k', nargs='+', type=int, default=[5],
@@ -319,13 +319,13 @@ def main():
     harness.export_detailed_csv(all_results, args.output_csv)
 
     print(f"\n{'=' * 60}")
-    print("✓ Fixed experiments complete!")
+    print("✓ Experiments complete!")
     print(f"  Results: {args.output_csv}")
     print(f"{'=' * 60}")
-    print("\nNow check:")
-    print("1. Indexing times - ONNX vs nomic-embed-text may differ")
-    print("2. F1 scores - should differ if embeddings retrieve different chunks")
-    print("3. chunk_X_source columns - compare retrieval across different embedding models")
+    print("\nCheck results:")
+    print("1. Indexing times - ONNX (79MB) vs Ollama (274MB)")
+    print("2. F1 scores - different models may retrieve different chunks")
+    print("3. chunk_X_source columns - compare which documents were retrieved")
 
 
 if __name__ == "__main__":

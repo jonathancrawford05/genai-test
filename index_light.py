@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 """
-Ultra-lightweight indexing script using ChromaDB's default embeddings.
-This avoids loading sentence-transformers and PyTorch entirely.
+Lightweight PDF indexing script using ONNX embeddings.
+Memory-efficient with fast ONNX runtime.
 """
 import sys
 import time
 from dotenv import load_dotenv
 
-from src.ultra_light_processor import UltraLightProcessor
+from src.onnx_processor import ONNXProcessor
 
 def main():
     load_dotenv()
 
     print("=" * 60)
-    print("ULTRA-LIGHT PDF INDEXING")
-    print("(Using ChromaDB's default embedding function)")
+    print("PDF INDEXING - ONNX EMBEDDINGS")
+    print("(all-MiniLM-L6-v2, 79MB, 384 dims)")
     print("=" * 60)
 
-    # Initialize processor (larger chunks, batched additions)
-    processor = UltraLightProcessor(
-        persist_directory="./chroma_db_light",
-        collection_name="pdf_documents_light",
-        chunk_size=2000,  # Larger chunks = fewer total chunks
+    # Initialize processor
+    processor = ONNXProcessor(
+        persist_directory="./chroma_db_onnx",
+        collection_name="pdf_documents",
+        chunk_size=2000,
         chunk_overlap=200,
-        batch_size=20,  # Add 20 chunks at a time (much faster)
+        batch_size=20,
     )
 
     # Check if already indexed
