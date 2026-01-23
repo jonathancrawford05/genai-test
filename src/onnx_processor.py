@@ -20,16 +20,39 @@ class ONNXProcessor(BasePDFProcessor):
     def _setup_collection(self):
         """
         Create collection with ChromaDB's default ONNX embedding function.
+        Validates dimension compatibility and recreates if needed.
         """
-        collection = self.client.get_or_create_collection(
-            name=self.collection_name,
-            metadata={
-                "description": "PDF chunks with ONNX embeddings",
-                "embedding_model": "all-MiniLM-L6-v2",
-                "embedding_type": "onnx",
-                "dimensions": 384,
-            },
-        )
+        collection_name = self.collection_name
+
+        # Try to get existing collection
+        try:
+            collection = self.client.get_collection(name=collection_name)
+
+            # Check if dimensions match (ONNX = 384)
+            metadata = collection.metadata or {}
+            stored_dims = metadata.get("dimensions")
+
+            if stored_dims and stored_dims != 384:
+                print(f"⚠️  Collection has wrong dimensions ({stored_dims} != 384)")
+                print(f"   Deleting and recreating collection...")
+                self.client.delete_collection(name=collection_name)
+                collection = None
+        except Exception:
+            # Collection doesn't exist
+            collection = None
+
+        # Create if doesn't exist
+        if collection is None:
+            collection = self.client.create_collection(
+                name=collection_name,
+                metadata={
+                    "description": "PDF chunks with ONNX embeddings",
+                    "embedding_model": "all-MiniLM-L6-v2",
+                    "embedding_type": "onnx",
+                    "dimensions": 384,
+                },
+            )
+
         print(f"✓ ONNX collection ready: {collection.count()} existing chunks")
         return collection
 
