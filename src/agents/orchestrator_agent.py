@@ -131,6 +131,7 @@ class OrchestratorAgent(BaseAgent):
         plan = self.planner.create_plan(
             question=question,
             selected_documents=selected_docs,
+            summaries=self.router.summaries,  # Pass summaries from router
             verbose=verbose
         )
 
