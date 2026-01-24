@@ -437,8 +437,18 @@ IMPORTANT: Always use the tool. The tool will validate that filenames are exact 
             # Extract documents
             selected_docs = arguments.get("documents", [])
 
+            # Double-check if documents is a string (nested JSON encoding)
+            if isinstance(selected_docs, str):
+                try:
+                    selected_docs = json.loads(selected_docs)
+                except json.JSONDecodeError:
+                    raise ValueError(f"Documents field is a string but not valid JSON: {selected_docs[:100]}")
+
             if not selected_docs:
                 raise ValueError(f"No documents in tool call arguments. Arguments keys: {list(arguments.keys())}")
+
+            if not isinstance(selected_docs, list):
+                raise ValueError(f"Documents must be a list, got {type(selected_docs)}: {str(selected_docs)[:100]}")
 
             # Take top_k
             selected_docs = selected_docs[:top_k]

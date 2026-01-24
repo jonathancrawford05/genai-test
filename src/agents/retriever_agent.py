@@ -17,6 +17,7 @@ from ..ollama_processor import OllamaProcessor
 class RetrievalResult:
     """Result from executing a single retrieval step."""
     step_number: int
+    description: str  # Step description
     query: str
     chunks: List[Dict[str, Any]]  # Retrieved chunks with metadata
     num_chunks: int
@@ -340,6 +341,7 @@ class RetrieverAgent(BaseAgent):
 
         return RetrievalResult(
             step_number=step.step_number,
+            description=step.description,
             query=step.query,
             chunks=chunks,
             num_chunks=len(chunks),

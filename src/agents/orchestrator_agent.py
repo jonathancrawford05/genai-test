@@ -241,7 +241,7 @@ class OrchestratorAgent(BaseAgent):
                 continue
 
             # Add step header
-            step_header = f"=== Step {step_result.step.step_number}: {step_result.step.description} ==="
+            step_header = f"=== Step {step_result.step_number}: {step_result.description} ==="
             context_parts.append(step_header)
             context_parts.append("")
 
