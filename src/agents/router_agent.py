@@ -135,16 +135,25 @@ class RouterAgent(BaseAgent):
                 reset_history=False  # Keep reasoning in context
             )
 
+            if verbose:
+                # Debug: show what we got back
+                message = response.get("message", {})
+                has_tool_calls = bool(message.get("tool_calls"))
+                has_content = bool(message.get("content"))
+                print(f"  Response type: tool_calls={has_tool_calls}, content={has_content}")
+                if has_content:
+                    print(f"  Content preview: {message.get('content', '')[:100]}...")
+
             # Parse tool call response
             selected_docs = self._parse_tool_response(response, top_k)
 
         except Exception as e:
             if verbose:
                 print(f"  ⚠️  Tool calling failed: {e}")
-                print(f"     Falling back to direct parsing...")
+                print(f"     Falling back to JSON extraction from reasoning...")
 
-            # Fallback: try to parse reasoning response directly
-            selected_docs = self._parse_response(reasoning_response, top_k)
+            # Fallback: try to extract document names from reasoning response
+            selected_docs = self._extract_docs_from_reasoning(reasoning_response, top_k)
 
         if verbose:
             print(f"\nSelected documents:")
@@ -416,6 +425,15 @@ IMPORTANT: Always use the tool. The tool will validate that filenames are exact 
             function = tool_call.get("function", {})
             arguments = function.get("arguments", {})
 
+            # Ollama may return arguments as a JSON string
+            if isinstance(arguments, str):
+                arguments = json.loads(arguments)
+            elif arguments is None:
+                arguments = {}
+
+            if not isinstance(arguments, dict):
+                raise ValueError("Tool call arguments must be a JSON object")
+
             # Extract documents
             selected_docs = arguments.get("documents", [])
 
@@ -435,6 +453,43 @@ IMPORTANT: Always use the tool. The tool will validate that filenames are exact 
 
         except Exception as e:
             raise ValueError(f"Failed to parse tool response: {e}")
+
+    def _extract_docs_from_reasoning(self, reasoning: str, top_k: int) -> List[str]:
+        """
+        Extract document filenames from reasoning text as fallback.
+
+        Looks for filenames mentioned in the reasoning response and validates them.
+
+        Args:
+            reasoning: Reasoning text from step 1
+            top_k: Number of documents to extract
+
+        Returns:
+            List of document filenames
+        """
+        found_docs = []
+
+        # Try to find any valid filename mentioned in the text
+        for filename in sorted(self.summaries.keys()):
+            # Check if filename appears in reasoning (with or without ID prefix)
+            if filename in reasoning:
+                found_docs.append(filename)
+            else:
+                # Try matching without ID prefix
+                clean_filename = filename.split(')-', 1)[-1] if ')-' in filename else filename
+                if clean_filename in reasoning and len(clean_filename) > 10:  # Avoid short matches
+                    found_docs.append(filename)
+
+            if len(found_docs) >= top_k:
+                break
+
+        if found_docs:
+            return found_docs[:top_k]
+
+        # Last resort: alphabetical fallback
+        print(f"     ⚠️  No valid documents found in reasoning text")
+        print(f"     Using fallback: first {top_k} documents alphabetically")
+        return sorted(self.summaries.keys())[:top_k]
 
     def get_document_summary(self, filename: str) -> Optional[Dict]:
         """
