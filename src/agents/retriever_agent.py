@@ -238,8 +238,56 @@ class RetrieverAgent(BaseAgent):
                 if verbose and len(chunks) <= 3:  # Show first 3
                     print(f"    [{i+1}] {source_file} (p{chunk['page_number']}): {doc_text[:80]}...")
 
-        # Warn if all chunks were filtered out
-        if verbose and filtered_out > 0 and len(chunks) == 0:
+        # Fallback to partial matching if all chunks were filtered out
+        if len(chunks) == 0 and filtered_out > 0 and step.target_documents:
+            if verbose:
+                print(f"    ⚠️  All {filtered_out} chunks filtered out by exact match")
+                print(f"    Attempting partial filename matching...")
+
+            # Try partial matching
+            for i, (doc_text, metadata) in enumerate(zip(
+                results['documents'][0],
+                results['metadatas'][0]
+            )):
+                source_file = metadata.get('source_file', '')
+
+                # Check if any target document is a substring of source_file or vice versa
+                match_found = False
+                matched_target = None
+                for target_doc in step.target_documents:
+                    # Remove common prefixes like "(numbers-numbers)-" for comparison
+                    clean_source = source_file.split(')-', 1)[-1] if ')-' in source_file else source_file
+                    clean_target = target_doc.split(')-', 1)[-1] if ')-' in target_doc else target_doc
+
+                    if clean_target in clean_source or clean_source in clean_target:
+                        match_found = True
+                        matched_target = target_doc
+                        break
+
+                if not match_found:
+                    continue
+
+                chunk = {
+                    'text': doc_text,
+                    'source_file': source_file,
+                    'page_number': metadata.get('page_number', 'unknown'),
+                    'chunk_index': metadata.get('chunk_index', i),
+                    'distance': results.get('distances', [[]])[0][i] if results.get('distances') else None
+                }
+                chunks.append(chunk)
+
+                if verbose and len(chunks) <= 3:  # Show first 3
+                    print(f"    [{i+1}] {source_file} (p{chunk['page_number']}) [partial match: {matched_target}]")
+                    print(f"        {doc_text[:80]}...")
+
+            if verbose:
+                if len(chunks) > 0:
+                    print(f"    ✓ Partial matching retrieved {len(chunks)} chunks")
+                else:
+                    print(f"    ⚠️  No matches found even with partial matching")
+
+        # Warn if still no chunks after partial matching
+        elif verbose and filtered_out > 0 and len(chunks) == 0:
             print(f"    ⚠️  All {filtered_out} chunks filtered out (document name mismatch)")
             print(f"    Target docs: {step.target_documents}")
             if results and results.get('metadatas') and results['metadatas'][0]:

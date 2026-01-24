@@ -136,7 +136,7 @@ You must:
 1. Analyze the question to understand what information is needed
 2. Review each document summary to determine relevance
 3. Select the top-k most relevant documents
-4. Return ONLY a JSON array of filenames
+4. Return ONLY a JSON array of EXACT filenames as shown in the document list
 
 Be strategic:
 - Prioritize documents that directly contain the needed information
@@ -144,7 +144,12 @@ Be strategic:
 - Select complementary documents (e.g., both rules and rates if needed)
 - Focus on relevance, not just keyword matching
 
-Return format: ["filename1.pdf", "filename2.pdf", "filename3.pdf"]
+CRITICAL: Return the EXACT filename as shown in the document list, including all prefixes, ID numbers, and version numbers.
+
+CORRECT example: ["(215066178-180449588)-CT MAPS Homeowner Rules Manual eff 08.18.25 v4.pdf"]
+WRONG example: ["CT MAPS Homeowner Rules Manual eff 08.18.25 v4.pdf"]
+
+Return format: ["exact_filename1.pdf", "exact_filename2.pdf", "exact_filename3.pdf"]
 
 Return ONLY the JSON array, no explanation or other text."""
 
@@ -179,7 +184,10 @@ Available documents ({len(self.summaries)} total):
 {documents_text}
 
 Select the {top_k} most relevant documents to answer this question.
-Return ONLY a JSON array of filenames: ["file1.pdf", "file2.pdf", ...]"""
+
+IMPORTANT: Copy the EXACT filename from the list above, including all prefixes like "(12345-67890)-" and version numbers.
+
+Return ONLY a JSON array of EXACT filenames: ["exact_file1.pdf", "exact_file2.pdf", ...]"""
 
         return prompt
 
