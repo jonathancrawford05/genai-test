@@ -173,19 +173,142 @@ python test_router.py --mode interactive
 - ✅ Verbose mode for debugging
 - ✅ Configurable top-k selection
 
-## Phase 3: Planner Agent
+## Phase 3: Planner Agent (COMPLETE ✅)
 
-### Planned Implementation
+### Status: Ready to Use
+
+Strategy formulation agent that creates multi-step retrieval plans.
+
+### Implementation
 
 ```python
-class PlannerAgent:
-    def create_plan(self, question: str, documents: List[str]) -> Plan:
-        """
-        Formulate multi-step retrieval strategy.
+from src.agents.planner_agent import PlannerAgent, PlannerConfig, RetrievalPlan
 
-        Returns: Structured plan with steps
-        """
+# Initialize planner
+planner = PlannerAgent(
+    config=PlannerConfig(
+        model="llama3.2",
+        temperature=0.0,
+        enable_conversation=True
+    )
+)
+
+# Create plan (after Router selects documents)
+plan = planner.create_plan(
+    question="Calculate premium for Tier 1, PC 5, $500k, 2% deductible",
+    selected_documents=["rate_pages.pdf", "factors.pdf"],
+    summaries=router.summaries,
+    verbose=True
+)
+
+# Plan structure:
+# plan.strategy - High-level approach
+# plan.steps - List of RetrievalStep objects
+# plan.requires_combination - True if steps must be combined
 ```
+
+### Plan Structure
+
+```python
+@dataclass
+class RetrievalPlan:
+    question: str
+    strategy: str  # High-level approach
+    steps: List[RetrievalStep]
+    success_criteria: str
+    requires_combination: bool  # Multi-hop reasoning?
+
+@dataclass
+class RetrievalStep:
+    step_number: int
+    description: str
+    target_documents: List[str]
+    query: str
+    expected_output: str
+```
+
+### Configuration
+
+```python
+@dataclass
+class PlannerConfig:
+    model: str = "llama3.2"
+    temperature: float = 0.0
+    max_tokens: int = 1024
+    enable_conversation: bool = True
+```
+
+### Testing
+
+```bash
+# Run test suite (Router → Planner integration)
+python test_planner.py --mode test
+
+# Interactive mode
+python test_planner.py --mode interactive
+
+# Test plan refinement (conversational)
+python test_planner.py --mode refinement
+```
+
+### How It Works
+
+1. **Receive input**: Question + selected documents from Router
+2. **Analyze question**: Break down into logical retrieval steps
+3. **Create plan**: Structured steps with queries and target docs
+4. **Determine complexity**: Single-step vs multi-hop reasoning
+5. **Return plan**: Ready for Retriever agent to execute
+
+### Example Plans
+
+**Simple Question (EF_1):**
+```
+Question: "What are the rules for ineligible risks?"
+Strategy: "Direct lookup of ineligibility rules from rules manual"
+Steps:
+  1. Search rules manual for "ineligible risk" sections
+     Query: "ineligible risk rules restrictions"
+     Expected: List of ineligibility criteria
+Requires combination: False
+```
+
+**Complex Question (EF_2):**
+```
+Question: "Premium for Tier 1, PC 5, $500k, 2% deductible"
+Strategy: "Multi-step lookup and calculation"
+Steps:
+  1. Find base rate for Tier 1, PC 5, $500k
+     Query: "Tier 1 Protection Class 5 $500,000 base rate"
+     Docs: rate_pages.pdf
+  2. Find deductible factor for 2%
+     Query: "2% deductible factor multiplier"
+     Docs: rate_pages.pdf
+  3. Calculate final premium
+     Expected: base_rate × deductible_factor
+Requires combination: True
+```
+
+### Conversational Refinement
+
+```python
+# Refine plan based on feedback
+refined_plan = planner.refine_plan(
+    plan=original_plan,
+    feedback="Step 2 should search factors.pdf not rates.pdf",
+    verbose=True
+)
+```
+
+### Features
+
+- ✅ Multi-step plan creation
+- ✅ Single-step vs multi-hop detection
+- ✅ Document targeting per step
+- ✅ Specific query formulation
+- ✅ Conversational refinement
+- ✅ JSON serialization (to_dict/from_dict)
+- ✅ Fallback to simple plan if parsing fails
+- ✅ Integration with Router
 
 ## Phase 4: Retriever Agent
 
@@ -271,7 +394,7 @@ python fixed_experiment.py \
 
 - [x] Phase 1: Document Summary Generation
 - [x] Phase 2: Router Agent
-- [ ] Phase 3: Planner Agent
+- [x] Phase 3: Planner Agent
 - [ ] Phase 4: Retriever Agent
 - [ ] Phase 5: Orchestrator
 - [ ] Phase 6: Experiment Integration
@@ -287,15 +410,20 @@ python fixed_experiment.py \
 2. ~~**Review and refine** summaries~~ ✅ DONE
    - Summaries in `artifacts/document_summaries.json`
 
-3. **Test Router Agent**:
+3. ~~**Test Router Agent**~~ ✅ DONE
    ```bash
-   # Run test suite
    python test_router.py --mode test
-
-   # Interactive testing
-   python test_router.py --mode interactive
    ```
 
-4. **Proceed to Phase 3**: Implement Planner Agent
+4. **Test Router → Planner pipeline**:
+   ```bash
+   # Run integrated test suite
+   python test_planner.py --mode test
 
-5. **Test incrementally**: Compare baseline vs router-only vs full pipeline
+   # Interactive testing
+   python test_planner.py --mode interactive
+   ```
+
+5. **Proceed to Phase 4**: Implement Retriever Agent
+
+6. **Test incrementally**: Compare baseline vs router-only vs full pipeline
