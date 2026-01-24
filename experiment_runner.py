@@ -6,6 +6,7 @@ Part 2 of GenAI Test: Systematic evaluation of different configurations.
 import pandas as pd
 import time
 import json
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, asdict
@@ -63,6 +64,23 @@ class ExperimentRunner:
         """
         self.questions_df = pd.read_csv(questions_csv)
         self.results: List[QuestionResult] = []
+
+    def clean_chroma_collections(self):
+        """
+        Clean ChromaDB collections to avoid dimension mismatches.
+
+        This ensures each variation starts with fresh, correctly-dimensioned collections.
+        """
+        import shutil
+
+        dirs_to_clean = ["./chroma_db_onnx", "./chroma_db_ollama"]
+
+        for dir_path in dirs_to_clean:
+            if Path(dir_path).exists():
+                print(f"  Cleaning {dir_path}...")
+                shutil.rmtree(dir_path)
+
+        print("✓ ChromaDB collections cleaned\n")
 
     def create_variations(self) -> List[VariationConfig]:
         """
@@ -257,12 +275,13 @@ class ExperimentRunner:
 
         return result
 
-    def run_all_experiments(self, verbose: bool = True) -> pd.DataFrame:
+    def run_all_experiments(self, verbose: bool = True, clean_collections: bool = True) -> pd.DataFrame:
         """
         Run all variations on all questions.
 
         Args:
             verbose: Print progress
+            clean_collections: Clean ChromaDB collections before starting (recommended)
 
         Returns:
             DataFrame with all results
@@ -276,6 +295,11 @@ class ExperimentRunner:
         print(f"Variations: {len(variations)}")
         print(f"Total runs: {len(self.questions_df) * len(variations)}")
         print(f"{'='*70}\n")
+
+        # Clean collections to avoid dimension mismatches
+        if clean_collections:
+            print("Cleaning ChromaDB collections to avoid dimension mismatches...")
+            self.clean_chroma_collections()
 
         for idx, row in self.questions_df.iterrows():
             question_id = row['id']
