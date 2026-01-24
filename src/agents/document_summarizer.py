@@ -29,13 +29,14 @@ class DocumentSummarizer:
         """
         self.model = model
 
-    def summarize_document(self, pdf_path: Path, sample_pages: int = 3) -> Dict:
+    def summarize_document(self, pdf_path: Path, sample_pages: int = 3, percent_pages = 0.05) -> Dict:
         """
         Generate structured summary of a PDF document.
 
         Args:
             pdf_path: Path to PDF file
             sample_pages: Number of random pages to sample (in addition to first page)
+            percent_pages: Minimum percentage of total pages to sample
 
         Returns:
             Dictionary with summary information
@@ -43,6 +44,7 @@ class DocumentSummarizer:
         # Extract text from PDF
         reader = PdfReader(pdf_path)
         total_pages = len(reader.pages)
+        sample_pages = max(int(total_pages*percent_pages), sample_pages)
 
         # Get first page (usually contains title/overview)
         first_page_text = reader.pages[0].extract_text() if total_pages > 0 else ""

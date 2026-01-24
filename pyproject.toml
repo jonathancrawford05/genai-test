@@ -32,3 +32,9 @@ dev = [
     "ipykernel (>=7.1.0,<8.0.0)",
     "pytest (>=9.0.2,<10.0.0)"
 ]
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^7.1.0"
+matplotlib = "^3.10.8"
+seaborn = "^0.13.2"
+
