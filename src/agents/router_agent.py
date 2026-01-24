@@ -438,16 +438,22 @@ IMPORTANT: Always use the tool. The tool will validate that filenames are exact 
             selected_docs = arguments.get("documents", [])
 
             if not selected_docs:
-                raise ValueError("No documents in tool call arguments")
+                raise ValueError(f"No documents in tool call arguments. Arguments keys: {list(arguments.keys())}")
 
             # Take top_k
             selected_docs = selected_docs[:top_k]
 
             # Validate all documents exist (should be guaranteed by enum, but double-check)
             valid_docs = [doc for doc in selected_docs if doc in self.summaries]
+            invalid_docs = [doc for doc in selected_docs if doc not in self.summaries]
+
+            if invalid_docs:
+                print(f"  ⚠️  Warning: Tool returned {len(invalid_docs)} invalid documents:")
+                for doc in invalid_docs[:3]:  # Show first 3
+                    print(f"     - {doc}")
 
             if not valid_docs:
-                raise ValueError("No valid documents returned by tool")
+                raise ValueError(f"No valid documents returned by tool. Total selected: {len(selected_docs)}, All invalid.")
 
             return valid_docs
 
