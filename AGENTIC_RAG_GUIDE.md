@@ -105,38 +105,73 @@ After generation:
 }
 ```
 
-## Phase 2: Router Agent (NEXT)
+## Phase 2: Router Agent (COMPLETE ✅)
 
-### Planned Implementation
+### Status: Ready to Use
+
+Document routing agent that selects top-k most relevant documents from summaries.
+
+### Implementation
 
 ```python
-class RouterAgent:
-    def select_documents(self, question: str, summaries: Dict) -> List[str]:
-        """
-        Select relevant documents based on question and summaries.
+from src.agents.router_agent import RouterAgent, RouterConfig
 
-        Returns: List of document filenames
-        """
+# Initialize router
+router = RouterAgent(
+    summaries_path="artifacts/document_summaries.json",
+    config=RouterConfig(
+        model="llama3.2",
+        top_k_docs=3,
+        temperature=0.0
+    )
+)
+
+# Select documents for a question
+selected_docs = router.select_documents(
+    question="What are the rules for ineligible risks?",
+    top_k=3,
+    verbose=True
+)
+# Returns: ["CT_Rules_Manual.pdf", "Underwriting_Checklist.pdf", ...]
 ```
 
 ### Configuration
 
 ```python
 @dataclass
-class AgentConfig:
-    # Enable/disable agents
-    enable_router: bool = True
-    enable_planner: bool = True
-
-    # LLM assignments
-    router_llm: str = "llama3.2"
-    planner_llm: str = "llama3.2"
-    retriever_llm: str = "llama3.2"
-
-    # Parameters
-    router_top_k_docs: int = 3
-    retriever_top_k_chunks: int = 5
+class RouterConfig:
+    model: str = "llama3.2"           # LLM for routing
+    top_k_docs: int = 3                # How many docs to select
+    temperature: float = 0.0           # Deterministic
+    max_tokens: int = 512              # Response length
 ```
+
+### Testing
+
+```bash
+# Run test suite with sample questions
+python test_router.py --mode test
+
+# Interactive mode - test with custom questions
+python test_router.py --mode interactive
+```
+
+### How It Works
+
+1. **Load summaries**: Reads `artifacts/document_summaries.json`
+2. **Format prompt**: Presents all document summaries to LLM
+3. **LLM selection**: llama3.2 analyzes and selects most relevant documents
+4. **Parse response**: Extracts JSON array of filenames
+5. **Validate**: Ensures selected documents exist in summaries
+
+### Features
+
+- ✅ Strategic document selection (not just keyword matching)
+- ✅ Considers document types (rules vs rates vs forms)
+- ✅ Fallback handling if LLM fails
+- ✅ Conversation history support (via BaseAgent)
+- ✅ Verbose mode for debugging
+- ✅ Configurable top-k selection
 
 ## Phase 3: Planner Agent
 
@@ -235,7 +270,7 @@ python fixed_experiment.py \
 ## Development Status
 
 - [x] Phase 1: Document Summary Generation
-- [ ] Phase 2: Router Agent
+- [x] Phase 2: Router Agent
 - [ ] Phase 3: Planner Agent
 - [ ] Phase 4: Retriever Agent
 - [ ] Phase 5: Orchestrator
@@ -244,13 +279,23 @@ python fixed_experiment.py \
 
 ## Next Steps
 
-1. **Run summary generation** on your machine:
+1. ~~**Run summary generation** on your machine~~ ✅ DONE
    ```bash
    python generate_summaries.py
    ```
 
-2. **Review and refine** summaries in `artifacts/document_summaries.json`
+2. ~~**Review and refine** summaries~~ ✅ DONE
+   - Summaries in `artifacts/document_summaries.json`
 
-3. **Proceed to Phase 2**: Implement Router Agent
+3. **Test Router Agent**:
+   ```bash
+   # Run test suite
+   python test_router.py --mode test
 
-4. **Test incrementally**: Compare baseline vs router-only vs full pipeline
+   # Interactive testing
+   python test_router.py --mode interactive
+   ```
+
+4. **Proceed to Phase 3**: Implement Planner Agent
+
+5. **Test incrementally**: Compare baseline vs router-only vs full pipeline

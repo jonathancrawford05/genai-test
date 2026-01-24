@@ -8,7 +8,13 @@ Architecture:
 """
 
 from .document_summarizer import DocumentSummarizer
+from .base_agent import BaseAgent, Message
+from .router_agent import RouterAgent, RouterConfig
 
 __all__ = [
     "DocumentSummarizer",
+    "BaseAgent",
+    "Message",
+    "RouterAgent",
+    "RouterConfig",
 ]
