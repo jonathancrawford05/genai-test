@@ -82,6 +82,10 @@ class RouterAgent(BaseAgent):
         """
         Select top-k most relevant documents for answering the question.
 
+        Uses two-step approach:
+        1. Free-form reasoning to identify candidate documents
+        2. Tool calling to select exact filenames from valid list
+
         Args:
             question: User question
             top_k: Number of documents to select (uses config default if not provided)
@@ -92,9 +96,6 @@ class RouterAgent(BaseAgent):
         """
         top_k = top_k or self.config.top_k_docs
 
-        # Build prompt
-        prompt = self._build_routing_prompt(question, top_k)
-
         if verbose:
             print(f"\n{'=' * 60}")
             print("ROUTER AGENT - DOCUMENT SELECTION")
@@ -102,16 +103,48 @@ class RouterAgent(BaseAgent):
             print(f"Question: {question}")
             print(f"Selecting top {top_k} documents from {len(self.summaries)}...")
 
-        # Call LLM
-        response = self._call_llm(
-            prompt=prompt,
-            system_prompt=self._get_system_prompt(),
-            max_tokens=self.config.max_tokens,
-            reset_history=True  # Each routing is independent
+        # Step 1: Free-form reasoning about relevant documents
+        reasoning_prompt = self._build_reasoning_prompt(question, top_k)
+
+        if verbose:
+            print(f"\n[Step 1] Analyzing document relevance...")
+
+        reasoning_response = self._call_llm(
+            prompt=reasoning_prompt,
+            system_prompt=self._get_reasoning_system_prompt(),
+            max_tokens=1024,  # More tokens for reasoning
+            reset_history=True
         )
 
-        # Parse response
-        selected_docs = self._parse_response(response, top_k)
+        if verbose:
+            print(f"Reasoning: {reasoning_response[:200]}...")
+
+        # Step 2: Select exact filenames using tool calling
+        selection_prompt = self._build_selection_prompt(question, reasoning_response, top_k)
+        tools = self._get_selection_tools()
+
+        if verbose:
+            print(f"\n[Step 2] Selecting exact filenames with validation...")
+
+        try:
+            response = self._call_llm_with_tools(
+                prompt=selection_prompt,
+                tools=tools,
+                system_prompt=self._get_selection_system_prompt(),
+                max_tokens=512,
+                reset_history=False  # Keep reasoning in context
+            )
+
+            # Parse tool call response
+            selected_docs = self._parse_tool_response(response, top_k)
+
+        except Exception as e:
+            if verbose:
+                print(f"  ⚠️  Tool calling failed: {e}")
+                print(f"     Falling back to direct parsing...")
+
+            # Fallback: try to parse reasoning response directly
+            selected_docs = self._parse_response(reasoning_response, top_k)
 
         if verbose:
             print(f"\nSelected documents:")
@@ -236,6 +269,172 @@ Return ONLY a JSON array of EXACT filenames: ["exact_file1.pdf", "exact_file2.pd
             # Fallback: return first k documents alphabetically
             print(f"     Using fallback: first {top_k} documents alphabetically")
             return sorted(self.summaries.keys())[:top_k]
+
+    def _build_reasoning_prompt(self, question: str, top_k: int) -> str:
+        """
+        Build prompt for reasoning step (identifies candidate documents).
+
+        Args:
+            question: User question
+            top_k: Number of documents to select
+
+        Returns:
+            Formatted prompt string
+        """
+        # Format document summaries for prompt
+        doc_list = []
+        for i, (filename, summary_data) in enumerate(sorted(self.summaries.items()), 1):
+            doc_entry = f"""
+{i}. {filename}
+   Type: {summary_data.get('document_type', 'unknown')}
+   Summary: {summary_data.get('summary', 'No summary available')}
+   Use for: {summary_data.get('use_for', 'N/A')}
+   Key topics: {', '.join(summary_data.get('key_topics', [])[:5])}
+"""
+            doc_list.append(doc_entry.strip())
+
+        documents_text = "\n\n".join(doc_list)
+
+        prompt = f"""Question: "{question}"
+
+Available documents ({len(self.summaries)} total):
+{documents_text}
+
+Analyze which {top_k} documents would be most relevant to answer this question.
+
+Consider:
+- What type of information does the question need? (rules, rates, calculations, etc.)
+- Which documents contain that type of information?
+- Are multiple documents needed for a complete answer?
+
+List the top {top_k} candidate documents with brief reasoning for each."""
+
+        return prompt
+
+    def _get_reasoning_system_prompt(self) -> str:
+        """Get system prompt for reasoning step."""
+        return """You are an expert document analyst for an insurance underwriting and rating system.
+
+Your task: Analyze which documents are most relevant to answer a given question.
+
+Think step-by-step:
+1. What type of information does the question require?
+2. Which document types typically contain that information?
+3. Which specific documents match those criteria?
+
+Be thorough in your analysis. Consider document types, summaries, and key topics."""
+
+    def _build_selection_prompt(self, question: str, reasoning: str, top_k: int) -> str:
+        """
+        Build prompt for selection step (uses tool to pick exact filenames).
+
+        Args:
+            question: User question
+            reasoning: Reasoning from step 1
+            top_k: Number of documents to select
+
+        Returns:
+            Formatted prompt string
+        """
+        prompt = f"""Based on your analysis:
+
+{reasoning}
+
+Now use the 'select_documents' tool to select the top {top_k} documents.
+
+CRITICAL: You MUST use the select_documents tool and provide EXACT filenames from the available list.
+Do not attempt to type filenames manually - use the tool to ensure exact matches."""
+
+        return prompt
+
+    def _get_selection_system_prompt(self) -> str:
+        """Get system prompt for selection step."""
+        return """You are finalizing document selection for a question answering system.
+
+You have already analyzed which documents are relevant. Now you must use the select_documents tool to formally select them.
+
+IMPORTANT: Always use the tool. The tool will validate that filenames are exact and valid."""
+
+    def _get_selection_tools(self) -> List[Dict]:
+        """
+        Get tool definition for document selection.
+
+        Returns:
+            List containing tool definition
+        """
+        # Get all valid filenames
+        valid_filenames = sorted(self.summaries.keys())
+
+        tool = {
+            "type": "function",
+            "function": {
+                "name": "select_documents",
+                "description": "Select documents by their exact filenames. Only filenames from the provided list are valid.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "documents": {
+                            "type": "array",
+                            "description": "List of exact document filenames to select",
+                            "items": {
+                                "type": "string",
+                                "enum": valid_filenames
+                            }
+                        },
+                        "reasoning": {
+                            "type": "string",
+                            "description": "Brief explanation of why these documents were selected"
+                        }
+                    },
+                    "required": ["documents"]
+                }
+            }
+        }
+
+        return [tool]
+
+    def _parse_tool_response(self, response: Dict, top_k: int) -> List[str]:
+        """
+        Parse tool calling response to extract selected documents.
+
+        Args:
+            response: Response from _call_llm_with_tools
+            top_k: Expected number of documents
+
+        Returns:
+            List of document filenames
+        """
+        try:
+            message = response.get("message", {})
+            tool_calls = message.get("tool_calls", [])
+
+            if not tool_calls:
+                raise ValueError("No tool calls in response")
+
+            # Get first tool call (should be select_documents)
+            tool_call = tool_calls[0]
+            function = tool_call.get("function", {})
+            arguments = function.get("arguments", {})
+
+            # Extract documents
+            selected_docs = arguments.get("documents", [])
+
+            if not selected_docs:
+                raise ValueError("No documents in tool call arguments")
+
+            # Take top_k
+            selected_docs = selected_docs[:top_k]
+
+            # Validate all documents exist (should be guaranteed by enum, but double-check)
+            valid_docs = [doc for doc in selected_docs if doc in self.summaries]
+
+            if not valid_docs:
+                raise ValueError("No valid documents returned by tool")
+
+            return valid_docs
+
+        except Exception as e:
+            raise ValueError(f"Failed to parse tool response: {e}")
 
     def get_document_summary(self, filename: str) -> Optional[Dict]:
         """

@@ -198,6 +198,9 @@ class RetrieverAgent(BaseAgent):
         """
         Execute a single retrieval step.
 
+        Uses pre-filtered search: only searches within target documents specified in the plan.
+        Falls back to search-then-filter if pre-filtering fails.
+
         Args:
             step: RetrievalStep to execute
             verbose: Print details
@@ -205,11 +208,44 @@ class RetrieverAgent(BaseAgent):
         Returns:
             RetrievalResult with retrieved chunks
         """
-        # Query processor
-        results = self.processor.query(
-            query_text=step.query,
-            top_k=self.config.top_k_per_step
-        )
+        # Pre-filtered search: only search target documents
+        used_prefilter = False
+
+        if step.target_documents:
+            try:
+                # Use ChromaDB's where clause to pre-filter by source_file
+                results = self.processor.collection.query(
+                    query_texts=[step.query],
+                    n_results=self.config.top_k_per_step,
+                    where={
+                        "source_file": {
+                            "$in": step.target_documents
+                        }
+                    }
+                )
+                used_prefilter = True
+
+                if verbose:
+                    print(f"    Using pre-filtered search (target docs only)")
+
+            except Exception as e:
+                # Fallback to search-then-filter if pre-filtering fails
+                if verbose:
+                    print(f"    ⚠️  Pre-filtered search failed: {e}")
+                    print(f"    Falling back to search-then-filter...")
+
+                results = self.processor.query(
+                    query_text=step.query,
+                    top_k=self.config.top_k_per_step
+                )
+                used_prefilter = False
+        else:
+            # No target documents specified, search everything
+            results = self.processor.query(
+                query_text=step.query,
+                top_k=self.config.top_k_per_step
+            )
+            used_prefilter = False
 
         # Extract chunks with metadata
         chunks = []
@@ -220,9 +256,11 @@ class RetrieverAgent(BaseAgent):
                 results['documents'][0],
                 results['metadatas'][0]
             )):
-                # Filter by target documents
                 source_file = metadata.get('source_file', '')
-                if step.target_documents and source_file not in step.target_documents:
+
+                # If pre-filtering was used successfully, trust all results
+                # Otherwise (fallback mode), filter by target documents
+                if not used_prefilter and step.target_documents and source_file not in step.target_documents:
                     filtered_out += 1
                     continue
 
@@ -238,8 +276,9 @@ class RetrieverAgent(BaseAgent):
                 if verbose and len(chunks) <= 3:  # Show first 3
                     print(f"    [{i+1}] {source_file} (p{chunk['page_number']}): {doc_text[:80]}...")
 
-        # Fallback to partial matching if all chunks were filtered out
-        if len(chunks) == 0 and filtered_out > 0 and step.target_documents:
+        # Fallback to partial matching if we're in search-then-filter mode and all chunks were filtered out
+        # (Not needed if pre-filtering was successful, since pre-filter guarantees correct documents)
+        if not used_prefilter and len(chunks) == 0 and filtered_out > 0 and step.target_documents:
             if verbose:
                 print(f"    ⚠️  All {filtered_out} chunks filtered out by exact match")
                 print(f"    Attempting partial filename matching...")
@@ -286,13 +325,18 @@ class RetrieverAgent(BaseAgent):
                 else:
                     print(f"    ⚠️  No matches found even with partial matching")
 
-        # Warn if still no chunks after partial matching
-        elif verbose and filtered_out > 0 and len(chunks) == 0:
-            print(f"    ⚠️  All {filtered_out} chunks filtered out (document name mismatch)")
-            print(f"    Target docs: {step.target_documents}")
-            if results and results.get('metadatas') and results['metadatas'][0]:
-                unique_sources = set(m.get('source_file', '') for m in results['metadatas'][0][:3])
-                print(f"    Retrieved from: {list(unique_sources)}")
+        # Diagnostic warnings for debugging
+        if verbose and len(chunks) == 0:
+            if used_prefilter:
+                print(f"    ⚠️  Pre-filtered search returned 0 chunks")
+                print(f"    Target docs: {step.target_documents}")
+                print(f"    This may indicate the target documents don't contain relevant content")
+            elif filtered_out > 0:
+                print(f"    ⚠️  All {filtered_out} chunks filtered out (document name mismatch)")
+                print(f"    Target docs: {step.target_documents}")
+                if results and results.get('metadatas') and results['metadatas'][0]:
+                    unique_sources = set(m.get('source_file', '') for m in results['metadatas'][0][:3])
+                    print(f"    Retrieved from: {list(unique_sources)}")
 
         return RetrievalResult(
             step_number=step.step_number,
