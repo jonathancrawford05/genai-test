@@ -1,0 +1,301 @@
+"""
+Retriever Agent for executing multi-step retrieval plans.
+
+Executes structured plans using existing RAG processors.
+"""
+from typing import List, Dict, Optional, Any
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from .base_agent import BaseAgent
+from .planner_agent import RetrievalPlan, RetrievalStep
+from ..onnx_processor import ONNXProcessor
+from ..ollama_processor import OllamaProcessor
+
+
+@dataclass
+class RetrievalResult:
+    """Result from executing a single retrieval step."""
+    step_number: int
+    query: str
+    chunks: List[Dict[str, Any]]  # Retrieved chunks with metadata
+    num_chunks: int
+    target_documents: List[str]
+
+
+@dataclass
+class ExecutionResult:
+    """Complete result from executing a retrieval plan."""
+    question: str
+    plan_strategy: str
+    step_results: List[RetrievalResult]
+    requires_combination: bool
+    combined_context: Optional[str] = None  # If combination needed
+
+
+@dataclass
+class RetrieverConfig:
+    """Configuration for Retriever Agent."""
+    embedding_type: str = "onnx"  # "onnx" or "ollama"
+    top_k_per_step: int = 5  # Chunks per step
+    model: str = "llama3.2"  # For combination/synthesis
+    temperature: float = 0.0
+
+
+class RetrieverAgent(BaseAgent):
+    """
+    Retrieval execution agent.
+
+    Executes multi-step retrieval plans using existing processors.
+    Combines results if required for multi-hop reasoning.
+
+    Example:
+        retriever = RetrieverAgent(
+            processor=onnx_processor,
+            config=RetrieverConfig(embedding_type="onnx")
+        )
+
+        result = retriever.execute_plan(plan, verbose=True)
+    """
+
+    def __init__(
+        self,
+        processor: Optional[Any] = None,  # ONNXProcessor or OllamaProcessor
+        config: Optional[RetrieverConfig] = None,
+        pdf_folder: str = "artifacts/1"
+    ):
+        """
+        Initialize Retriever Agent.
+
+        Args:
+            processor: Existing processor instance (optional, will create if not provided)
+            config: Retriever configuration
+            pdf_folder: Path to PDF folder (for processor initialization)
+        """
+        self.config = config or RetrieverConfig()
+        super().__init__(model=self.config.model, temperature=self.config.temperature)
+
+        # Set up processor
+        if processor is None:
+            self.processor = self._create_processor(pdf_folder)
+        else:
+            self.processor = processor
+
+        print(f"✓ Retriever initialized with {self.config.embedding_type} embeddings")
+
+    def _create_processor(self, pdf_folder: str):
+        """
+        Create processor if not provided.
+
+        Args:
+            pdf_folder: Path to PDF folder
+
+        Returns:
+            Processor instance
+        """
+        if self.config.embedding_type == "onnx":
+            processor = ONNXProcessor(
+                persist_directory="./chroma_db_onnx",
+                collection_name="pdf_documents",
+            )
+        elif self.config.embedding_type == "ollama":
+            processor = OllamaProcessor(
+                persist_directory="./chroma_db_ollama",
+                collection_name="pdf_ollama_embeddings",
+            )
+        else:
+            raise ValueError(f"Unknown embedding type: {self.config.embedding_type}")
+
+        # Index if needed
+        if processor.count() == 0:
+            print(f"Indexing PDFs from {pdf_folder}...")
+            processor.process_folder(pdf_folder)
+
+        return processor
+
+    def execute_plan(
+        self,
+        plan: RetrievalPlan,
+        verbose: bool = False
+    ) -> ExecutionResult:
+        """
+        Execute retrieval plan step by step.
+
+        Args:
+            plan: RetrievalPlan from Planner agent
+            verbose: Print execution details
+
+        Returns:
+            ExecutionResult with retrieved information
+        """
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print("RETRIEVER AGENT - PLAN EXECUTION")
+            print(f"{'=' * 60}")
+            print(f"Question: {plan.question}")
+            print(f"Strategy: {plan.strategy}")
+            print(f"Steps: {len(plan.steps)}")
+            print(f"Requires combination: {plan.requires_combination}")
+
+        # Execute each step
+        step_results = []
+        for step in plan.steps:
+            if verbose:
+                print(f"\n{'─' * 60}")
+                print(f"Executing Step {step.step_number}: {step.description}")
+                print(f"{'─' * 60}")
+                print(f"  Query: \"{step.query}\"")
+                print(f"  Target docs: {', '.join(step.target_documents)}")
+
+            result = self._execute_step(step, verbose=verbose)
+            step_results.append(result)
+
+            if verbose:
+                print(f"  ✓ Retrieved {result.num_chunks} chunks")
+
+        # Combine results if needed
+        combined_context = None
+        if plan.requires_combination:
+            if verbose:
+                print(f"\n{'─' * 60}")
+                print("Combining multi-step results...")
+                print(f"{'─' * 60}")
+
+            combined_context = self._combine_results(step_results, plan.question, verbose=verbose)
+
+            if verbose:
+                print(f"  ✓ Context combined ({len(combined_context)} chars)")
+
+        # Create execution result
+        execution_result = ExecutionResult(
+            question=plan.question,
+            plan_strategy=plan.strategy,
+            step_results=step_results,
+            requires_combination=plan.requires_combination,
+            combined_context=combined_context
+        )
+
+        if verbose:
+            print(f"\n{'=' * 60}")
+            print("✓ Plan execution complete")
+            print(f"{'=' * 60}")
+
+        return execution_result
+
+    def _execute_step(
+        self,
+        step: RetrievalStep,
+        verbose: bool = False
+    ) -> RetrievalResult:
+        """
+        Execute a single retrieval step.
+
+        Args:
+            step: RetrievalStep to execute
+            verbose: Print details
+
+        Returns:
+            RetrievalResult with retrieved chunks
+        """
+        # Query processor
+        results = self.processor.query(
+            query_text=step.query,
+            top_k=self.config.top_k_per_step
+        )
+
+        # Extract chunks with metadata
+        chunks = []
+        if results and results.get('documents') and results['documents'][0]:
+            for i, (doc_text, metadata) in enumerate(zip(
+                results['documents'][0],
+                results['metadatas'][0]
+            )):
+                # Filter by target documents
+                source_file = metadata.get('source_file', '')
+                if step.target_documents and source_file not in step.target_documents:
+                    continue
+
+                chunk = {
+                    'text': doc_text,
+                    'source_file': source_file,
+                    'page_number': metadata.get('page_number', 'unknown'),
+                    'chunk_index': metadata.get('chunk_index', i),
+                    'distance': results.get('distances', [[]])[0][i] if results.get('distances') else None
+                }
+                chunks.append(chunk)
+
+                if verbose and len(chunks) <= 3:  # Show first 3
+                    print(f"    [{i+1}] {source_file} (p{chunk['page_number']}): {doc_text[:80]}...")
+
+        return RetrievalResult(
+            step_number=step.step_number,
+            query=step.query,
+            chunks=chunks,
+            num_chunks=len(chunks),
+            target_documents=step.target_documents
+        )
+
+    def _combine_results(
+        self,
+        step_results: List[RetrievalResult],
+        question: str,
+        verbose: bool = False
+    ) -> str:
+        """
+        Combine results from multiple steps (multi-hop reasoning).
+
+        Args:
+            step_results: Results from all steps
+            question: Original question
+            verbose: Print combination process
+
+        Returns:
+            Combined context string
+        """
+        # Build context from all steps
+        context_parts = []
+
+        for result in step_results:
+            step_context = f"=== Step {result.step_number} ({result.query}) ===\n"
+
+            for i, chunk in enumerate(result.chunks[:3], 1):  # Top 3 per step
+                step_context += f"\n[{i}] {chunk['source_file']} (page {chunk['page_number']}):\n"
+                step_context += f"{chunk['text'][:500]}...\n"
+
+            context_parts.append(step_context)
+
+        # Combine all contexts
+        combined = "\n\n".join(context_parts)
+
+        # Optionally use LLM to synthesize (for now, just concatenate)
+        # Future: Could ask LLM to synthesize/summarize the combined context
+
+        if verbose:
+            print(f"  Combined context from {len(step_results)} steps")
+
+        return combined
+
+    def get_answer_context(self, execution_result: ExecutionResult, max_chunks: int = 5) -> str:
+        """
+        Get formatted context for answer generation.
+
+        Args:
+            execution_result: Result from execute_plan
+            max_chunks: Maximum chunks to include
+
+        Returns:
+            Formatted context string for LLM
+        """
+        if execution_result.combined_context:
+            return execution_result.combined_context
+
+        # No combination needed - format step results
+        context_parts = []
+
+        for result in execution_result.step_results:
+            for chunk in result.chunks[:max_chunks]:
+                context_parts.append(
+                    f"[{chunk['source_file']}, page {chunk['page_number']}]\n{chunk['text']}"
+                )
+
+        return "\n\n---\n\n".join(context_parts)

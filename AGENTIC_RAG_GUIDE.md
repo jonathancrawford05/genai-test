@@ -310,18 +310,172 @@ refined_plan = planner.refine_plan(
 - ✅ Fallback to simple plan if parsing fails
 - ✅ Integration with Router
 
-## Phase 4: Retriever Agent
+## Phase 4: Retriever Agent (COMPLETE ✅)
 
-### Planned Implementation
+### Status: Ready to Use
+
+Execution agent that performs actual retrieval using existing processors.
+
+### Implementation
 
 ```python
-class RetrieverAgent:
-    def execute_plan(self, plan: Plan, processor) -> Dict:
-        """
-        Execute retrieval plan using existing processors.
+from src.agents.retriever_agent import RetrieverAgent, RetrieverConfig
+from src.onnx_processor import ONNXProcessor
 
-        Returns: Retrieved information
-        """
+# Initialize processor (reuse existing index)
+processor = ONNXProcessor(
+    persist_directory="./chroma_db_onnx",
+    collection_name="pdf_documents"
+)
+
+# Initialize retriever
+retriever = RetrieverAgent(
+    processor=processor,
+    config=RetrieverConfig(
+        embedding_type="onnx",
+        top_k_per_step=5,
+        model="llama3.2"
+    )
+)
+
+# Execute plan (from Planner)
+execution_result = retriever.execute_plan(plan, verbose=True)
+
+# Get answer context
+context = retriever.get_answer_context(execution_result, max_chunks=5)
+```
+
+### Result Structures
+
+```python
+@dataclass
+class RetrievalResult:
+    step_number: int
+    query: str
+    chunks: List[Dict]  # Retrieved chunks with metadata
+    num_chunks: int
+    target_documents: List[str]
+
+@dataclass
+class ExecutionResult:
+    question: str
+    plan_strategy: str
+    step_results: List[RetrievalResult]
+    requires_combination: bool
+    combined_context: Optional[str]  # If multi-hop
+```
+
+### Configuration
+
+```python
+@dataclass
+class RetrieverConfig:
+    embedding_type: str = "onnx"  # "onnx" or "ollama"
+    top_k_per_step: int = 5
+    model: str = "llama3.2"  # For combination/synthesis
+    temperature: float = 0.0
+```
+
+### Testing
+
+```bash
+# Run full pipeline test (Router → Planner → Retriever)
+python test_retriever.py --mode test
+
+# Interactive mode
+python test_retriever.py --mode interactive
+
+# Test retriever only (with manual plan)
+python test_retriever.py --mode retriever-only
+```
+
+### How It Works
+
+1. **Receive plan**: Gets RetrievalPlan from Planner
+2. **Execute steps**: Sequentially executes each step
+   - Query processor with step query
+   - Filter by target documents
+   - Collect top-k chunks per step
+3. **Combine if needed**: If `requires_combination=True`
+   - Aggregates contexts from all steps
+   - Optionally synthesizes combined context
+4. **Return results**: ExecutionResult with all retrieved information
+
+### Example Execution
+
+**Simple Question (EF_1):**
+```
+Plan: 1 step, no combination
+Step 1: Query "ineligible risk rules restrictions"
+        Target: rules_manual.pdf
+        Retrieved: 5 chunks
+
+Result:
+  - 5 chunks from rules manual
+  - No combination needed
+  - Context ready for answer generation
+```
+
+**Complex Question (EF_2):**
+```
+Plan: 3 steps, requires combination
+Step 1: Query "Tier 1 Protection Class 5 $500,000 base rate"
+        Target: rate_pages.pdf
+        Retrieved: 5 chunks
+
+Step 2: Query "2% deductible factor multiplier"
+        Target: rate_pages.pdf
+        Retrieved: 5 chunks
+
+Step 3: Combine information
+        Expected: base_rate × deductible_factor
+
+Result:
+  - 10 chunks total (5 per step)
+  - Combined context created
+  - Ready for calculation/answer generation
+```
+
+### Features
+
+- ✅ Step-by-step plan execution
+- ✅ Integration with existing processors (ONNX/Ollama)
+- ✅ Document filtering per step
+- ✅ Top-k retrieval per step
+- ✅ Multi-hop combination
+- ✅ Chunk metadata preservation
+- ✅ Answer context generation
+- ✅ Verbose execution logging
+
+### Full Pipeline Example
+
+```python
+# Complete Router → Planner → Retriever pipeline
+from src.agents import RouterAgent, PlannerAgent, RetrieverAgent
+from src.onnx_processor import ONNXProcessor
+
+# Initialize
+router = RouterAgent(summaries_path="artifacts/document_summaries.json")
+planner = PlannerAgent()
+processor = ONNXProcessor(persist_directory="./chroma_db_onnx")
+retriever = RetrieverAgent(processor=processor)
+
+# Execute pipeline
+question = "What are the rules for ineligible risks?"
+
+# Step 1: Route
+selected_docs = router.select_documents(question, top_k=3)
+
+# Step 2: Plan
+plan = planner.create_plan(question, selected_docs, router.summaries)
+
+# Step 3: Retrieve
+result = retriever.execute_plan(plan, verbose=True)
+
+# Step 4: Get answer context
+context = retriever.get_answer_context(result)
+
+# Now context can be used with LLM for final answer generation
 ```
 
 ## Integration with Experiments
@@ -395,7 +549,7 @@ python fixed_experiment.py \
 - [x] Phase 1: Document Summary Generation
 - [x] Phase 2: Router Agent
 - [x] Phase 3: Planner Agent
-- [ ] Phase 4: Retriever Agent
+- [x] Phase 4: Retriever Agent
 - [ ] Phase 5: Orchestrator
 - [ ] Phase 6: Experiment Integration
 - [ ] Phase 7: Evaluation & Iteration
@@ -415,15 +569,22 @@ python fixed_experiment.py \
    python test_router.py --mode test
    ```
 
-4. **Test Router → Planner pipeline**:
+4. ~~**Test Router → Planner pipeline**~~ ✅ DONE
    ```bash
-   # Run integrated test suite
    python test_planner.py --mode test
-
-   # Interactive testing
-   python test_planner.py --mode interactive
    ```
 
-5. **Proceed to Phase 4**: Implement Retriever Agent
+5. **Test Full Pipeline (Router → Planner → Retriever)**:
+   ```bash
+   # Run complete pipeline test
+   python test_retriever.py --mode test
 
-6. **Test incrementally**: Compare baseline vs router-only vs full pipeline
+   # Interactive testing
+   python test_retriever.py --mode interactive
+   ```
+
+6. **Proceed to Phase 5**: Implement Orchestrator (wires agents together)
+
+7. **Phase 6**: Integrate with experiment harness for A/B testing
+
+8. **Test incrementally**: Compare baseline vs router-only vs full pipeline
