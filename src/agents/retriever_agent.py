@@ -75,13 +75,21 @@ class RetrieverAgent(BaseAgent):
         self.config = config or RetrieverConfig()
         super().__init__(model=self.config.model, temperature=self.config.temperature)
 
+        # Store pdf_folder for potential indexing
+        self.pdf_folder = pdf_folder
+
         # Set up processor
         if processor is None:
             self.processor = self._create_processor(pdf_folder)
         else:
             self.processor = processor
+            # Check if processor has data, index if empty
+            if self.processor.count() == 0:
+                print(f"⚠️  Processor has no data. Indexing PDFs from {pdf_folder}...")
+                self.processor.process_folder(pdf_folder)
+                print(f"✓ Indexed {self.processor.count()} chunks")
 
-        print(f"✓ Retriever initialized with {self.config.embedding_type} embeddings")
+        print(f"✓ Retriever initialized with {self.config.embedding_type} embeddings ({self.processor.count()} chunks)")
 
     def _create_processor(self, pdf_folder: str):
         """
@@ -205,6 +213,8 @@ class RetrieverAgent(BaseAgent):
 
         # Extract chunks with metadata
         chunks = []
+        filtered_out = 0
+
         if results and results.get('documents') and results['documents'][0]:
             for i, (doc_text, metadata) in enumerate(zip(
                 results['documents'][0],
@@ -213,6 +223,7 @@ class RetrieverAgent(BaseAgent):
                 # Filter by target documents
                 source_file = metadata.get('source_file', '')
                 if step.target_documents and source_file not in step.target_documents:
+                    filtered_out += 1
                     continue
 
                 chunk = {
@@ -226,6 +237,14 @@ class RetrieverAgent(BaseAgent):
 
                 if verbose and len(chunks) <= 3:  # Show first 3
                     print(f"    [{i+1}] {source_file} (p{chunk['page_number']}): {doc_text[:80]}...")
+
+        # Warn if all chunks were filtered out
+        if verbose and filtered_out > 0 and len(chunks) == 0:
+            print(f"    ⚠️  All {filtered_out} chunks filtered out (document name mismatch)")
+            print(f"    Target docs: {step.target_documents}")
+            if results and results.get('metadatas') and results['metadatas'][0]:
+                unique_sources = set(m.get('source_file', '') for m in results['metadatas'][0][:3])
+                print(f"    Retrieved from: {list(unique_sources)}")
 
         return RetrievalResult(
             step_number=step.step_number,
