@@ -32,7 +32,7 @@ class BasePDFProcessor(ABC):
         self,
         persist_directory: str,
         collection_name: str,
-        chunk_size: int = 2000,
+        chunk_size: int = 1000,
         chunk_overlap: int = 200,
         batch_size: int = 20,
     ):

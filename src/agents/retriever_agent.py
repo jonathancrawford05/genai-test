@@ -39,6 +39,8 @@ class RetrieverConfig:
     """Configuration for Retriever Agent."""
     embedding_type: str = "onnx"  # "onnx" or "ollama"
     top_k_per_step: int = 5  # Chunks per step
+    chunk_size: int = 1000  # Characters per chunk
+    chunk_overlap: int = 200  # Character overlap between chunks
     model: str = "llama3.2"  # For combination/synthesis
     temperature: float = 0.0
 
@@ -102,15 +104,22 @@ class RetrieverAgent(BaseAgent):
         Returns:
             Processor instance
         """
+        # Generate unique collection name based on configuration
+        collection_name = f"pdf_{self.config.embedding_type}_{self.config.chunk_size}_{self.config.chunk_overlap}"
+
         if self.config.embedding_type == "onnx":
             processor = ONNXProcessor(
                 persist_directory="./chroma_db_onnx",
-                collection_name="pdf_documents",
+                collection_name=collection_name,
+                chunk_size=self.config.chunk_size,
+                chunk_overlap=self.config.chunk_overlap,
             )
         elif self.config.embedding_type == "ollama":
             processor = OllamaProcessor(
                 persist_directory="./chroma_db_ollama",
-                collection_name="pdf_ollama_embeddings",
+                collection_name=collection_name,
+                chunk_size=self.config.chunk_size,
+                chunk_overlap=self.config.chunk_overlap,
             )
         else:
             raise ValueError(f"Unknown embedding type: {self.config.embedding_type}")

@@ -185,6 +185,32 @@ class ExperimentRunner:
                     )
                 )
             ),
+
+            # Variation 5: Large chunks
+            VariationConfig(
+                name="large_chunks",
+                description="ONNX embeddings, chunk_size=2000 (more context per chunk, baseline uses 1000)",
+                orchestrator_config=OrchestratorConfig(
+                    model="llama3.2",
+                    temperature=0.0,
+                    max_answer_tokens=2048,
+                    router_config=RouterConfig(
+                        model="llama3.2",
+                        top_k_docs=3,
+                        temperature=0.0
+                    ),
+                    planner_config=PlannerConfig(
+                        model="llama3.2",
+                        temperature=0.0
+                    ),
+                    retriever_config=RetrieverConfig(
+                        embedding_type="onnx",
+                        top_k_per_step=5,
+                        chunk_size=2000,  # Larger chunks
+                        chunk_overlap=200
+                    )
+                )
+            ),
         ]
 
         return variations

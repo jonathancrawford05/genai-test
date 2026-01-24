@@ -25,7 +25,7 @@ class OllamaProcessor(BasePDFProcessor):
         persist_directory: str = "./chroma_db_ollama",
         collection_name: str = "pdf_ollama_embeddings",
         model_name: str = "nomic-embed-text",
-        chunk_size: int = 2000,
+        chunk_size: int = 1000,
         chunk_overlap: int = 200,
         batch_size: int = 20,
     ):
