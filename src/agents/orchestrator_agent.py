@@ -276,7 +276,7 @@ class OrchestratorAgent(BaseAgent):
         """
         prompt = f"""Question: "{question}"
 
-Strategy: {execution_result.plan.strategy}
+Strategy: {execution_result.plan_strategy}
 
 Retrieved Information:
 {context}
