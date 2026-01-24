@@ -274,21 +274,18 @@ class OrchestratorAgent(BaseAgent):
         Returns:
             Formatted prompt
         """
-        prompt = f"""Question: "{question}"
+        prompt = f"""Based on the retrieved information below, answer the following question:
 
-Strategy: {execution_result.plan_strategy}
+QUESTION: {question}
 
-Retrieved Information:
+RETRIEVAL STRATEGY: {execution_result.plan_strategy}
+
+RETRIEVED INFORMATION FROM DOCUMENTS:
 {context}
 
-Instructions:
-1. Answer the question using ONLY the information provided above
-2. Be specific and cite relevant details from the documents
-3. If the information is insufficient or unclear, state what is missing
-4. Do not make assumptions beyond what is stated in the documents
-5. Structure your answer clearly (use bullet points if appropriate)
+Now, please answer the question "{question}" based ONLY on the information above. Be specific and cite relevant details from the documents. If information is missing or unclear, state that explicitly.
 
-Answer:"""
+ANSWER:"""
 
         return prompt
 
