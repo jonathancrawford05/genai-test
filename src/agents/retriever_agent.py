@@ -10,7 +10,6 @@ from pathlib import Path
 from .base_agent import BaseAgent
 from .planner_agent import RetrievalPlan, RetrievalStep
 from ..onnx_processor import ONNXProcessor
-from ..ollama_processor import OllamaProcessor
 
 
 @dataclass
@@ -37,7 +36,6 @@ class ExecutionResult:
 @dataclass
 class RetrieverConfig:
     """Configuration for Retriever Agent."""
-    embedding_type: str = "onnx"  # "onnx" or "ollama"
     top_k_per_step: int = 5  # Chunks per step
     chunk_size: int = 1000  # Characters per chunk
     chunk_overlap: int = 200  # Character overlap between chunks
@@ -55,7 +53,7 @@ class RetrieverAgent(BaseAgent):
     Example:
         retriever = RetrieverAgent(
             processor=onnx_processor,
-            config=RetrieverConfig(embedding_type="onnx")
+            config=RetrieverConfig(top_k_per_step=5)
         )
 
         result = retriever.execute_plan(plan, verbose=True)
@@ -63,7 +61,7 @@ class RetrieverAgent(BaseAgent):
 
     def __init__(
         self,
-        processor: Optional[Any] = None,  # ONNXProcessor or OllamaProcessor
+        processor: Optional[Any] = None,  # ONNXProcessor
         config: Optional[RetrieverConfig] = None,
         pdf_folder: str = "artifacts/1"
     ):
@@ -92,37 +90,27 @@ class RetrieverAgent(BaseAgent):
                 self.processor.process_folder(pdf_folder)
                 print(f"✓ Indexed {self.processor.count()} chunks")
 
-        print(f"✓ Retriever initialized with {self.config.embedding_type} embeddings ({self.processor.count()} chunks)")
+        print(f"✓ Retriever initialized with ONNX embeddings ({self.processor.count()} chunks)")
 
     def _create_processor(self, pdf_folder: str):
         """
-        Create processor if not provided.
+        Create ONNX processor if not provided.
 
         Args:
             pdf_folder: Path to PDF folder
 
         Returns:
-            Processor instance
+            ONNXProcessor instance
         """
-        # Generate unique collection name based on configuration
-        collection_name = f"pdf_{self.config.embedding_type}_{self.config.chunk_size}_{self.config.chunk_overlap}"
+        # Generate unique collection name based on chunk configuration
+        collection_name = f"pdf_{self.config.chunk_size}_{self.config.chunk_overlap}"
 
-        if self.config.embedding_type == "onnx":
-            processor = ONNXProcessor(
-                persist_directory="./chroma_db_onnx",
-                collection_name=collection_name,
-                chunk_size=self.config.chunk_size,
-                chunk_overlap=self.config.chunk_overlap,
-            )
-        elif self.config.embedding_type == "ollama":
-            processor = OllamaProcessor(
-                persist_directory="./chroma_db_ollama",
-                collection_name=collection_name,
-                chunk_size=self.config.chunk_size,
-                chunk_overlap=self.config.chunk_overlap,
-            )
-        else:
-            raise ValueError(f"Unknown embedding type: {self.config.embedding_type}")
+        processor = ONNXProcessor(
+            persist_directory="./chroma_db",
+            collection_name=collection_name,
+            chunk_size=self.config.chunk_size,
+            chunk_overlap=self.config.chunk_overlap,
+        )
 
         # Index if needed
         if processor.count() == 0:

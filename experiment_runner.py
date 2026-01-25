@@ -67,18 +67,17 @@ class ExperimentRunner:
 
     def clean_chroma_collections(self):
         """
-        Clean ChromaDB collections to avoid dimension mismatches.
+        Clean ChromaDB collections to ensure fresh indexes for each experiment run.
 
-        This ensures each variation starts with fresh, correctly-dimensioned collections.
+        This ensures each variation starts with fresh collections.
         """
         import shutil
 
-        dirs_to_clean = ["./chroma_db_onnx", "./chroma_db_ollama"]
+        dir_path = "./chroma_db"
 
-        for dir_path in dirs_to_clean:
-            if Path(dir_path).exists():
-                print(f"  Cleaning {dir_path}...")
-                shutil.rmtree(dir_path)
+        if Path(dir_path).exists():
+            print(f"  Cleaning {dir_path}...")
+            shutil.rmtree(dir_path)
 
         print("✓ ChromaDB collections cleaned\n")
 
@@ -93,7 +92,7 @@ class ExperimentRunner:
             # Variation 1: Baseline (current system)
             VariationConfig(
                 name="baseline",
-                description="ONNX embeddings, pre-filtered search, top_k_docs=3, top_k_per_step=5",
+                description="Pre-filtered search, top_k_docs=3, top_k_per_step=5, chunk_size=1000",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -108,40 +107,15 @@ class ExperimentRunner:
                         temperature=0.0
                     ),
                     retriever_config=RetrieverConfig(
-                        embedding_type="onnx",
                         top_k_per_step=5
                     )
                 )
             ),
 
-            # Variation 2: Ollama embeddings (higher quality)
-            VariationConfig(
-                name="ollama_embeddings",
-                description="Ollama embeddings (nomic-embed-text), pre-filtered search, same parameters",
-                orchestrator_config=OrchestratorConfig(
-                    model="llama3.2",
-                    temperature=0.0,
-                    max_answer_tokens=2048,
-                    router_config=RouterConfig(
-                        model="llama3.2",
-                        top_k_docs=3,
-                        temperature=0.0
-                    ),
-                    planner_config=PlannerConfig(
-                        model="llama3.2",
-                        temperature=0.0
-                    ),
-                    retriever_config=RetrieverConfig(
-                        embedding_type="ollama",
-                        top_k_per_step=5
-                    )
-                )
-            ),
-
-            # Variation 3: Higher retrieval depth
+            # Variation 2: Higher retrieval depth
             VariationConfig(
                 name="high_depth",
-                description="ONNX embeddings, top_k_docs=5, top_k_per_step=10 (more context)",
+                description="top_k_docs=5, top_k_per_step=10 (more context)",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -156,16 +130,15 @@ class ExperimentRunner:
                         temperature=0.0
                     ),
                     retriever_config=RetrieverConfig(
-                        embedding_type="onnx",
                         top_k_per_step=10  # More chunks per step
                     )
                 )
             ),
 
-            # Variation 4: Conservative retrieval
+            # Variation 3: Conservative retrieval
             VariationConfig(
                 name="conservative",
-                description="ONNX embeddings, top_k_docs=2, top_k_per_step=3 (less context, faster)",
+                description="top_k_docs=2, top_k_per_step=3 (less context, faster)",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -180,16 +153,15 @@ class ExperimentRunner:
                         temperature=0.0
                     ),
                     retriever_config=RetrieverConfig(
-                        embedding_type="onnx",
                         top_k_per_step=3  # Fewer chunks per step
                     )
                 )
             ),
 
-            # Variation 5: Large chunks
+            # Variation 4: Large chunks
             VariationConfig(
                 name="large_chunks",
-                description="ONNX embeddings, chunk_size=2000 (more context per chunk, baseline uses 1000)",
+                description="chunk_size=2000 (more context per chunk, baseline uses 1000)",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -204,7 +176,6 @@ class ExperimentRunner:
                         temperature=0.0
                     ),
                     retriever_config=RetrieverConfig(
-                        embedding_type="onnx",
                         top_k_per_step=5,
                         chunk_size=2000,  # Larger chunks
                         chunk_overlap=200

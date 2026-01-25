@@ -2,12 +2,11 @@
 # Clear all ChromaDB databases to start fresh
 
 echo "============================================================"
-echo "CLEAR ALL CHROMADB DATABASES"
+echo "CLEAR CHROMADB DATABASE"
 echo "============================================================"
 echo ""
 echo "This will delete:"
-echo "  - chroma_db_onnx/"
-echo "  - chroma_db_ollama/"
+echo "  - chroma_db/"
 echo ""
 echo "You will need to re-index your PDFs after this."
 echo ""
@@ -19,18 +18,23 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# Remove databases
+# Remove database
+if [ -d "chroma_db" ]; then
+    echo "Removing chroma_db..."
+    rm -rf chroma_db
+fi
+
+# Remove any legacy databases
 if [ -d "chroma_db_onnx" ]; then
-    echo "Removing chroma_db_onnx..."
+    echo "Removing chroma_db_onnx (legacy)..."
     rm -rf chroma_db_onnx
 fi
 
 if [ -d "chroma_db_ollama" ]; then
-    echo "Removing chroma_db_ollama..."
+    echo "Removing chroma_db_ollama (legacy)..."
     rm -rf chroma_db_ollama
 fi
 
-# Remove any legacy databases
 if [ -d "chroma_db_light" ]; then
     echo "Removing chroma_db_light (legacy)..."
     rm -rf chroma_db_light

@@ -14,21 +14,14 @@ This system implements a multi-agent Retrieval-Augmented Generation (RAG) pipeli
 - Manages ChromaDB collections for vector storage
 - Default: 1000 char chunks, 200 char overlap
 
-**Embedding Implementations:**
+**Embedding Implementation:**
 - **ONNXProcessor** (`src/onnx_processor.py`)
   - Model: all-MiniLM-L6-v2
   - Size: 79MB
   - Dimensions: 384
   - Runtime: CPU-optimized ONNX
-  - Collection: `chroma_db_onnx/`
-
-- **OllamaProcessor** (`src/ollama_processor.py`)
-  - Model: nomic-embed-text
-  - Size: 274MB
-  - Dimensions: 768
-  - Runtime: Ollama
-  - RAG-optimized with 8k context
-  - Collection: `chroma_db_ollama/`
+  - Collection: `chroma_db/`
+  - Chosen for performance after experimentation
 
 ### 2. Multi-Agent Pipeline
 
@@ -382,16 +375,15 @@ class RetrieverConfig:
 
 | Component | Latency | Memory | Notes |
 |-----------|---------|--------|-------|
-| ONNX Embeddings | ~50ms/chunk | ~500MB | CPU-optimized |
-| Ollama Embeddings | ~100ms/chunk | ~1GB | Better quality, slower |
+| ONNX Embeddings | ~50ms/chunk | ~500MB | CPU-optimized, 384 dims |
 | Router Agent | ~2-5s | ~200MB | Single LLM call |
 | Planner Agent | ~3-8s | ~200MB | Complex reasoning |
-| Retriever Agent | ~0.5-2s | ~500MB-1GB | Depends on embedding type |
+| Retriever Agent | ~0.5-2s | ~500MB | ONNX embeddings |
 
 **Bottlenecks:**
 - LLM calls (Router, Planner) dominate latency
-- Ollama embeddings 2x slower than ONNX but higher quality
 - Index size grows linearly with PDF count
+- Retrieval speed depends on top_k parameters
 
 ## Key Design Decisions
 
@@ -411,6 +403,6 @@ class RetrieverConfig:
    - Chose: Manual cleanup, no parameter tracking
    - Rationale: Simplicity for prototype, avoid premature complexity
 
-5. **Two embedding options**
-   - Chose: ONNX (fast, small) and Ollama (quality, RAG-optimized)
-   - Rationale: Allow quality vs speed tradeoffs in experiments
+5. **ONNX embeddings (standardized)**
+   - Chose: Single embedding model (ONNX all-MiniLM-L6-v2)
+   - Rationale: Performed best in experiments, simpler codebase, faster performance

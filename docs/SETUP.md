@@ -4,7 +4,7 @@
 
 - **Python**: 3.11+
 - **Poetry**: For dependency management
-- **Ollama**: For LLM inference and embeddings
+- **Ollama**: For LLM inference
 
 ## Installation
 
@@ -50,11 +50,8 @@ Download from https://ollama.com/download
 In a separate terminal:
 
 ```bash
-# Pull LLM model
+# Pull LLM model for inference
 ollama pull llama3.2
-
-# Pull embedding model (for Ollama embeddings variation)
-ollama pull nomic-embed-text
 ```
 
 ## Generating Document Summaries
@@ -128,8 +125,8 @@ genai-test/
 │   │   ├── planner_agent.py    # Strategy formulation
 │   │   ├── retriever_agent.py  # Chunk retrieval
 │   │   └── orchestrator_agent.py  # Pipeline coordination
-│   ├── onnx_processor.py       # ONNX embeddings
-│   └── ollama_processor.py     # Ollama embeddings
+│   ├── base_processor.py       # Base processor class
+│   └── onnx_processor.py       # ONNX embeddings
 ├── artifacts/
 │   ├── questions.csv           # Test questions
 │   ├── document_summaries.json # Pre-generated summaries
@@ -155,7 +152,7 @@ ollama serve
 
 Clear ChromaDB collections:
 ```bash
-rm -rf chroma_db_onnx chroma_db_ollama
+rm -rf chroma_db
 ```
 
 Re-run to rebuild indexes.
@@ -171,9 +168,9 @@ poetry run python -m src.agents.document_summarizer \
 
 ### Slow performance
 
-- **Use ONNX embeddings** (default) - 2x faster than Ollama
-- **Reduce top_k** - Fewer documents/chunks = faster
+- **Reduce top_k** - Fewer documents/chunks = faster retrieval
 - **Use SSD** - ChromaDB benefits from fast disk I/O
+- **Reduce chunk_size** - Smaller chunks = faster processing
 
 ## Verification
 
@@ -182,7 +179,7 @@ Test that everything is working:
 ```bash
 # 1. Check Ollama
 ollama list
-# Should show: llama3.2, nomic-embed-text
+# Should show: llama3.2
 
 # 2. Run quick test
 poetry run python test_orchestrator.py

@@ -83,24 +83,27 @@ results = collection.query(
 
 ---
 
-### Decision 4: ONNX vs Ollama Embeddings
+### Decision 4: ONNX Embeddings (Standardized)
 
-**Choice:** Support both, default to ONNX
+**Choice:** Use ONNX embeddings exclusively (all-MiniLM-L6-v2)
 
 **Rationale:**
-- **ONNX is faster and smaller** - 79MB vs 274MB, 2x faster indexing
-- **Ollama is higher quality** - 768 dims vs 384, RAG-optimized
-- **Experimentation requires comparison** - Part 2 needs to test both
+- **Performance superior to alternatives** - Experiments showed ONNX outperformed Ollama embeddings
+- **Simpler codebase** - Single embedding model reduces complexity
+- **Faster and smaller** - 79MB model, 384 dimensions, 2x faster than Ollama (768 dims)
+- **No additional dependencies** - Built into ChromaDB, no Ollama server required for embeddings
+
+**Previous approach:**
+Originally supported both ONNX and Ollama embeddings (nomic-embed-text) for comparison. After experimentation, baseline ONNX configuration performed best, so Ollama embeddings were removed to simplify the system.
 
 **Tradeoff:**
-| Aspect | ONNX (all-MiniLM-L6-v2) | Ollama (nomic-embed-text) |
-|--------|-------------------------|---------------------------|
-| Speed | ⚡ Fast (baseline) | 🐌 2x slower |
-| Quality | ⭐ Good | ⭐⭐ Better |
-| Memory | 💾 79MB | 💾 274MB |
-| Setup | ✅ Built-in ChromaDB | ⚠️ Requires Ollama |
+- ✅ Faster indexing and retrieval
+- ✅ Simpler codebase (removed ~350 lines)
+- ✅ Single directory structure (./chroma_db)
+- ❌ Less flexibility for embedding experimentation
+- ❌ Locked into 384-dimensional embeddings
 
-**Default:** ONNX for speed, Ollama as variation for quality experiments
+**Note:** Ollama is still used for LLM inference (llama3.2), just not for embeddings.
 
 ---
 
@@ -172,20 +175,24 @@ results = collection.query(
 
 ## Experiment Design Decisions
 
-### Decision 8: 4 Variations (not 2 minimum)
+### Decision 8: 4 Variations Testing Retrieval Parameters
 
-**Choice:** Test 4 meaningful variations, not just 2
+**Choice:** Test 4 meaningful variations focusing on retrieval depth and chunk size
 
 **Rationale:**
-- **Embedding quality is key variable** - ONNX vs Ollama tests this
 - **Retrieval depth matters** - Conservative vs high-depth tests precision/recall tradeoff
+- **Chunk size affects context** - 1000 vs 2000 chars tests granularity vs context
 - **Baseline establishes floor** - Need reference point for comparison
+- **Focus on performance-impacting variables** - Test parameters that meaningfully affect results
 
 **Variations:**
-1. **Baseline** - Current best settings (ONNX, top_k=3/5)
-2. **Ollama embeddings** - Test quality improvement
-3. **High depth** - Test recall improvement (more docs/chunks)
-4. **Conservative** - Test speed improvement (fewer docs/chunks)
+1. **Baseline** - Standard settings (top_k_docs=3, top_k_per_step=5, chunk_size=1000)
+2. **High depth** - Test recall improvement (top_k_docs=5, top_k_per_step=10)
+3. **Conservative** - Test speed improvement (top_k_docs=2, top_k_per_step=3)
+4. **Large chunks** - Test context improvement (chunk_size=2000)
+
+**Previous approach:**
+Originally included "Ollama embeddings" variation, but baseline ONNX performed better and Ollama added complexity, so it was removed.
 
 **Tradeoff:**
 - ✅ Comprehensive comparison
@@ -339,4 +346,4 @@ ANSWER:
 
 ---
 
-**Last updated:** 2025-01-24
+**Last updated:** 2026-01-25
