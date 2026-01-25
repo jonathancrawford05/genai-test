@@ -181,6 +181,39 @@ Guidelines:
 - Be specific: Clear queries that will retrieve the right information
 - Be strategic: Order steps logically (dependencies first)
 
+SPECIAL HANDLING FOR LIST/ENUMERATION QUESTIONS:
+
+When the question asks to "list all", "list the", "enumerate", "what are all", or "show all":
+1. This is an ENUMERATION task - user wants a complete list, not detailed analysis
+2. Strategy: Single-step retrieval focusing on comprehensive lists or table of contents
+3. Query should target: "table of contents", "list of all", "index", "complete list", "section [X]"
+4. Do NOT break into multiple specific sub-category steps
+5. Set requires_combination: false (simple list, no synthesis needed)
+6. Keep query broad to capture the entire enumeration
+
+Example - CORRECT approach for "List all rating plan rules":
+{
+  "strategy": "Retrieve comprehensive list of rating plan rules from table of contents",
+  "steps": [{
+    "step_number": 1,
+    "description": "Retrieve complete list of all rating plan rules",
+    "target_documents": ["Homeowner Rules Manual.pdf"],
+    "query": "table of contents section C rating plan rules complete list",
+    "expected_output": "Complete enumeration of all rating plan rules (e.g., C-1, C-2, ..., C-35)"
+  }],
+  "requires_combination": false
+}
+
+Example - WRONG approach (too specific, will miss items):
+{
+  "strategy": "Break down into rule categories",
+  "steps": [
+    {"query": "Underwriting Guidelines", ...},
+    {"query": "Coverage limits", ...}
+  ],
+  "requires_combination": true
+}
+
 Return ONLY the JSON object, no other text."""
 
     def _build_planning_prompt(
@@ -215,8 +248,28 @@ Document: {doc}
 
         documents_text = "\n\n".join(doc_info)
 
-        prompt = f"""Question: "{question}"
+        # Detect enumeration/list questions
+        question_lower = question.lower()
+        enumeration_patterns = [
+            "list all", "list the", "what are all", "enumerate",
+            "show all", "give me all", "what are the"
+        ]
+        is_enumeration = any(pattern in question_lower for pattern in enumeration_patterns)
 
+        # Add enumeration hint if detected
+        enumeration_hint = ""
+        if is_enumeration:
+            enumeration_hint = """
+⚠️  ENUMERATION TASK DETECTED
+This question asks for a complete list/enumeration.
+- Use single-step retrieval focused on table of contents, index, or comprehensive lists
+- Query should be broad: "table of contents [topic]", "complete list of [items]", "all [items]"
+- Do NOT break into specific sub-categories (will miss items)
+- Set requires_combination: false
+"""
+
+        prompt = f"""Question: "{question}"
+{enumeration_hint}
 Available documents (selected by Router):
 {documents_text}
 
@@ -227,6 +280,7 @@ Consider:
 - Does it require information from multiple documents?
 - Are there dependencies between steps?
 - Does it involve calculations or combinations of information?
+- For LIST/ENUMERATION questions: Focus on comprehensive retrieval from indexes/TOCs
 
 Create a detailed retrieval plan as JSON."""
 
