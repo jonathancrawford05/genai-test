@@ -129,6 +129,9 @@ class BasePDFProcessor(ABC):
         """
         Process one PDF with batched additions to ChromaDB.
 
+        Uses full-document chunking to allow chunks to span pages,
+        solving issues with tables and content that spans page boundaries.
+
         Args:
             pdf_path: Path to PDF file
 
@@ -137,58 +140,138 @@ class BasePDFProcessor(ABC):
         """
         reader = PdfReader(pdf_path)
         total_pages = len(reader.pages)
-        chunks_added = 0
 
-        # Batch buffer
+        print(f"  Extracting {total_pages} pages: ", end="", flush=True)
+
+        # Step 1: Extract full document text and track page boundaries
+        full_text, page_boundaries = self._extract_full_document(reader, pdf_path.name)
+
+        if not full_text.strip():
+            print(" ✗ No text extracted")
+            return 0
+
+        print(f"✓ ({len(full_text):,} chars)")
+        print(f"  Chunking document: ", end="", flush=True)
+
+        # Step 2: Chunk the full document (chunks can now span pages!)
+        chunks_added = 0
         batch_texts = []
         batch_metas = []
         batch_ids = []
 
-        print(f"  Processing {total_pages} pages: ", end="", flush=True)
+        current_pos = 0
+        chunk_idx = 0
 
-        for page_num, page in enumerate(reader.pages, start=1):
-            # Show page progress
-            if page_num % 10 == 0 or page_num == total_pages:
-                print(f"[p{page_num}]", end="", flush=True)
-
-            try:
-                text = page.extract_text()
-                if not text or not text.strip():
-                    continue
-
-                # Collect chunks for batching
-                for chunk_idx, chunk_text in enumerate(self._chunk_text(text)):
-                    if not chunk_text.strip():
-                        continue
-
-                    batch_texts.append(chunk_text)
-                    batch_metas.append({
-                        "source_file": pdf_path.name,
-                        "page_number": page_num,
-                        "total_pages": total_pages,
-                        "chunk_index": chunk_idx,
-                    })
-                    batch_ids.append(f"{pdf_path.name}_p{page_num}_{chunk_idx}")
-
-                    # Flush batch when it reaches batch_size
-                    if len(batch_texts) >= self.batch_size:
-                        self._add_batch(batch_texts, batch_metas, batch_ids)
-                        chunks_added += len(batch_texts)
-                        batch_texts = []
-                        batch_metas = []
-                        batch_ids = []
-
-            except Exception as e:
-                print(f"\n    Warning: Page {page_num} failed: {e}")
+        for chunk_text in self._chunk_text(full_text):
+            if not chunk_text.strip():
                 continue
+
+            # Calculate chunk position in full text
+            chunk_start = current_pos
+            chunk_end = current_pos + len(chunk_text)
+
+            # Determine which pages this chunk spans
+            page_range = self._determine_page_range(chunk_start, chunk_end, page_boundaries)
+
+            batch_texts.append(chunk_text)
+            batch_metas.append({
+                "source_file": pdf_path.name,
+                "page_number": page_range,  # Can be "3" or "3-4" for multi-page chunks
+                "total_pages": total_pages,
+                "chunk_index": chunk_idx,
+            })
+            batch_ids.append(f"{pdf_path.name}_c{chunk_idx}")
+
+            chunk_idx += 1
+
+            # Update position for next chunk (accounting for overlap)
+            current_pos = chunk_end - self.chunk_overlap
+
+            # Flush batch when it reaches batch_size
+            if len(batch_texts) >= self.batch_size:
+                self._add_batch(batch_texts, batch_metas, batch_ids)
+                chunks_added += len(batch_texts)
+                batch_texts = []
+                batch_metas = []
+                batch_ids = []
 
         # Flush remaining chunks
         if batch_texts:
             self._add_batch(batch_texts, batch_metas, batch_ids)
             chunks_added += len(batch_texts)
 
-        print(f" ✓ {chunks_added} chunks")
+        print(f"✓ {chunks_added} chunks")
         return chunks_added
+
+    def _extract_full_document(self, reader: PdfReader, filename: str) -> Tuple[str, List[Dict]]:
+        """
+        Extract full document text and track page boundaries.
+
+        Args:
+            reader: PdfReader instance
+            filename: PDF filename for error messages
+
+        Returns:
+            Tuple of (full_text, page_boundaries)
+            page_boundaries is a list of dicts with {page, start_char, end_char}
+        """
+        full_text = ""
+        page_boundaries = []
+
+        for page_num, page in enumerate(reader.pages, start=1):
+            # Show progress every 10 pages
+            if page_num % 10 == 0:
+                print(f"[p{page_num}]", end="", flush=True)
+
+            try:
+                page_text = page.extract_text()
+                if page_text and page_text.strip():
+                    # Record where this page starts and ends in the full text
+                    page_boundaries.append({
+                        'page': page_num,
+                        'start_char': len(full_text),
+                        'end_char': len(full_text) + len(page_text)
+                    })
+                    # Add page text with double newline separator
+                    full_text += page_text + "\n\n"
+            except Exception as e:
+                print(f"\n    Warning: Page {page_num} failed: {e}")
+                continue
+
+        return full_text, page_boundaries
+
+    def _determine_page_range(self, chunk_start: int, chunk_end: int,
+                              page_boundaries: List[Dict]) -> str:
+        """
+        Map chunk character positions to page number(s).
+
+        Args:
+            chunk_start: Start position of chunk in full text
+            chunk_end: End position of chunk in full text
+            page_boundaries: List of page boundary dicts
+
+        Returns:
+            Page number as string ("3") or page range ("3-4") if chunk spans pages
+        """
+        pages = set()
+
+        for pb in page_boundaries:
+            # Check if chunk overlaps with this page
+            # Overlap occurs if chunk_end > page_start AND chunk_start < page_end
+            if chunk_end > pb['start_char'] and chunk_start < pb['end_char']:
+                pages.add(pb['page'])
+
+        if not pages:
+            return "unknown"
+
+        sorted_pages = sorted(pages)
+
+        # Single page
+        if len(sorted_pages) == 1:
+            return str(sorted_pages[0])
+
+        # Multiple consecutive pages - return range
+        return f"{sorted_pages[0]}-{sorted_pages[-1]}"
 
     def _chunk_text(self, text: str):
         """

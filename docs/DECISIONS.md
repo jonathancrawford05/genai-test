@@ -125,9 +125,46 @@ Originally supported both ONNX and Ollama embeddings (nomic-embed-text) for comp
 
 **Tradeoff:**
 - ✅ Good balance for mixed content (prose + tables)
-- ✅ Fast enough (1523 chunks total)
+- ✅ Fast enough (~1500 chunks total)
 - ❌ Not optimized per document type
-- ❌ May split some multi-page tables
+
+---
+
+### Decision 5a: Full-Document Chunking (Cross-Page Chunks)
+
+**Choice:** Extract entire document text first, then chunk (chunks can span pages)
+
+**Rationale:**
+- **Critical bug discovered** - Rating rules table spans pages 3-4, page-by-page chunking only captured 22/35 rules
+- **Many tables span pages** - TOC tables, rate tables, coverage tables in insurance PDFs
+- **Simple solution** - Minor refactor (~60 lines) vs complex table detection
+- **Page tracking preserved** - Chunks store page ranges (e.g., "3-4") instead of single pages
+
+**Previous approach:**
+Processed PDFs page-by-page, chunking each page independently. This prevented chunks from spanning page boundaries, causing multi-page tables to be split.
+
+**Implementation:**
+```python
+# 1. Extract full document with page boundary tracking
+full_text, page_boundaries = self._extract_full_document(reader)
+# page_boundaries: [{page: 1, start_char: 0, end_char: 2341}, ...]
+
+# 2. Chunk full text (crosses page boundaries naturally)
+for chunk in self._chunk_text(full_text):
+    chunk_start, chunk_end = get_position(chunk)
+    page_range = self._determine_page_range(chunk_start, chunk_end, page_boundaries)
+    # page_range could be "3" or "3-4" if chunk spans pages
+```
+
+**Tradeoff:**
+- ✅ **Solves multi-page table problem** - 35/35 rules now captured
+- ✅ **Better context preservation** - Natural content boundaries respected
+- ✅ **Simple implementation** - No external dependencies
+- ✅ **More informative metadata** - Page ranges show multi-page content
+- ❌ Page numbers become ranges (acceptable - more informative actually)
+- ❌ Slightly more complex position tracking (~40 lines)
+
+**Impact:** This change was critical for achieving correct results on EF_1 (list all rating plan rules).
 
 ---
 
