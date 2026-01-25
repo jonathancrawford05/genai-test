@@ -158,10 +158,10 @@ class ExperimentRunner:
                 )
             ),
 
-            # Variation 4: Sliding window expansion
+            # Variation 4: Sliding window expansion (document-level)
             VariationConfig(
                 name="sliding_window",
-                description="expand_context=2 (±2 chunks = ~5 chunks per retrieval, solves table splits)",
+                description="expand_context=2, document-level chunking (±2 chunks, can span pages)",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -177,9 +177,37 @@ class ExperimentRunner:
                     ),
                     retriever_config=RetrieverConfig(
                         top_k_per_step=5,
-                        chunk_size=1000,  # Keep baseline chunk size
+                        chunk_size=1000,
                         chunk_overlap=200,
-                        expand_context=2  # ±2 chunks sliding window
+                        expand_context=2,  # ±2 chunks sliding window
+                        chunking_strategy="document"
+                    )
+                )
+            ),
+
+            # Variation 5: Page-level + sliding window (EXPECTED BEST)
+            VariationConfig(
+                name="page_window",
+                description="expand_context=2, page-level chunking (high precision + complete tables)",
+                orchestrator_config=OrchestratorConfig(
+                    model="llama3.2",
+                    temperature=0.0,
+                    max_answer_tokens=2048,
+                    router_config=RouterConfig(
+                        model="llama3.2",
+                        top_k_docs=3,
+                        temperature=0.0
+                    ),
+                    planner_config=PlannerConfig(
+                        model="llama3.2",
+                        temperature=0.0
+                    ),
+                    retriever_config=RetrieverConfig(
+                        top_k_per_step=5,
+                        chunk_size=1000,
+                        chunk_overlap=200,
+                        expand_context=2,  # ±2 chunks sliding window
+                        chunking_strategy="page"  # Page-level for semantic focus
                     )
                 )
             ),

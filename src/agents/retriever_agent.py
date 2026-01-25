@@ -40,6 +40,7 @@ class RetrieverConfig:
     chunk_size: int = 1000  # Characters per chunk
     chunk_overlap: int = 200  # Character overlap between chunks
     expand_context: int = 0  # Chunks before/after to include (0 = no expansion)
+    chunking_strategy: str = "document"  # "page" or "document"
     model: str = "llama3.2"  # For combination/synthesis
     temperature: float = 0.0
 
@@ -111,6 +112,7 @@ class RetrieverAgent(BaseAgent):
             collection_name=collection_name,
             chunk_size=self.config.chunk_size,
             chunk_overlap=self.config.chunk_overlap,
+            chunking_strategy=self.config.chunking_strategy,
         )
 
         # Index if needed

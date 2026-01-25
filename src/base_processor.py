@@ -35,6 +35,7 @@ class BasePDFProcessor(ABC):
         chunk_size: int = 1000,
         chunk_overlap: int = 200,
         batch_size: int = 20,
+        chunking_strategy: str = "document",  # "page" or "document"
     ):
         """
         Initialize processor.
@@ -45,12 +46,14 @@ class BasePDFProcessor(ABC):
             chunk_size: Maximum characters per chunk
             chunk_overlap: Characters to overlap between chunks
             batch_size: Number of chunks to batch before adding to DB
+            chunking_strategy: "page" (chunk per page) or "document" (full-doc, can span pages)
         """
         self.persist_directory = persist_directory
         self.collection_name = collection_name
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.batch_size = batch_size
+        self.chunking_strategy = chunking_strategy
 
         # Initialize ChromaDB client
         print("Initializing ChromaDB...")
@@ -129,8 +132,25 @@ class BasePDFProcessor(ABC):
         """
         Process one PDF with batched additions to ChromaDB.
 
-        Uses full-document chunking to allow chunks to span pages,
-        solving issues with tables and content that spans page boundaries.
+        Delegates to page-level or document-level chunking based on strategy.
+
+        Args:
+            pdf_path: Path to PDF file
+
+        Returns:
+            Number of chunks added
+        """
+        if self.chunking_strategy == "page":
+            return self._process_single_pdf_page_level(pdf_path)
+        else:  # "document"
+            return self._process_single_pdf_document_level(pdf_path)
+
+    def _process_single_pdf_document_level(self, pdf_path: Path) -> int:
+        """
+        Process one PDF with full-document chunking.
+
+        Chunks can span multiple pages, solving issues with tables and content
+        that spans page boundaries.
 
         Args:
             pdf_path: Path to PDF file
@@ -201,6 +221,77 @@ class BasePDFProcessor(ABC):
             chunks_added += len(batch_texts)
 
         print(f"✓ {chunks_added} chunks")
+        return chunks_added
+
+    def _process_single_pdf_page_level(self, pdf_path: Path) -> int:
+        """
+        Process one PDF with page-by-page chunking.
+
+        Each page is chunked independently. Chunks cannot span pages,
+        which may split tables but provides better semantic focus.
+
+        Args:
+            pdf_path: Path to PDF file
+
+        Returns:
+            Number of chunks added
+        """
+        reader = PdfReader(pdf_path)
+        total_pages = len(reader.pages)
+        chunks_added = 0
+        global_chunk_idx = 0  # Track global chunk index across all pages
+
+        # Batch buffer
+        batch_texts = []
+        batch_metas = []
+        batch_ids = []
+
+        print(f"  Processing {total_pages} pages: ", end="", flush=True)
+
+        for page_num, page in enumerate(reader.pages, start=1):
+            # Show page progress
+            if page_num % 10 == 0 or page_num == total_pages:
+                print(f"[p{page_num}]", end="", flush=True)
+
+            try:
+                text = page.extract_text()
+                if not text or not text.strip():
+                    continue
+
+                # Chunk this page's text
+                for chunk_idx, chunk_text in enumerate(self._chunk_text(text)):
+                    if not chunk_text.strip():
+                        continue
+
+                    batch_texts.append(chunk_text)
+                    batch_metas.append({
+                        "source_file": pdf_path.name,
+                        "page_number": str(page_num),  # Single page number
+                        "total_pages": total_pages,
+                        "chunk_index": global_chunk_idx,  # Global chunk index across document
+                    })
+                    batch_ids.append(f"{pdf_path.name}_p{page_num}_c{chunk_idx}")
+
+                    global_chunk_idx += 1  # Increment global index
+
+                    # Flush batch when it reaches batch_size
+                    if len(batch_texts) >= self.batch_size:
+                        self._add_batch(batch_texts, batch_metas, batch_ids)
+                        chunks_added += len(batch_texts)
+                        batch_texts = []
+                        batch_metas = []
+                        batch_ids = []
+
+            except Exception as e:
+                print(f"\n    Warning: Page {page_num} failed: {e}")
+                continue
+
+        # Flush remaining chunks
+        if batch_texts:
+            self._add_batch(batch_texts, batch_metas, batch_ids)
+            chunks_added += len(batch_texts)
+
+        print(f" ✓ {chunks_added} chunks")
         return chunks_added
 
     def _extract_full_document(self, reader: PdfReader, filename: str) -> Tuple[str, List[Dict]]:
