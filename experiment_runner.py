@@ -158,10 +158,10 @@ class ExperimentRunner:
                 )
             ),
 
-            # Variation 4: Large chunks
+            # Variation 4: Sliding window expansion
             VariationConfig(
-                name="large_chunks",
-                description="chunk_size=2000 (more context per chunk, baseline uses 1000)",
+                name="sliding_window",
+                description="expand_context=2 (±2 chunks = ~5 chunks per retrieval, solves table splits)",
                 orchestrator_config=OrchestratorConfig(
                     model="llama3.2",
                     temperature=0.0,
@@ -177,8 +177,9 @@ class ExperimentRunner:
                     ),
                     retriever_config=RetrieverConfig(
                         top_k_per_step=5,
-                        chunk_size=2000,  # Larger chunks
-                        chunk_overlap=200
+                        chunk_size=1000,  # Keep baseline chunk size
+                        chunk_overlap=200,
+                        expand_context=2  # ±2 chunks sliding window
                     )
                 )
             ),

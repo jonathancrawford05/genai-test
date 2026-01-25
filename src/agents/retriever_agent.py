@@ -39,6 +39,7 @@ class RetrieverConfig:
     top_k_per_step: int = 5  # Chunks per step
     chunk_size: int = 1000  # Characters per chunk
     chunk_overlap: int = 200  # Character overlap between chunks
+    expand_context: int = 0  # Chunks before/after to include (0 = no expansion)
     model: str = "llama3.2"  # For combination/synthesis
     temperature: float = 0.0
 
@@ -336,14 +337,100 @@ class RetrieverAgent(BaseAgent):
                     unique_sources = set(m.get('source_file', '') for m in results['metadatas'][0][:3])
                     print(f"    Retrieved from: {list(unique_sources)}")
 
+        # Expand chunks with sliding window if configured
+        if self.config.expand_context > 0 and chunks:
+            expanded_chunks = self._expand_chunks_with_window(chunks, verbose=verbose)
+        else:
+            expanded_chunks = chunks
+
         return RetrievalResult(
             step_number=step.step_number,
             description=step.description,
             query=step.query,
-            chunks=chunks,
-            num_chunks=len(chunks),
+            chunks=expanded_chunks,
+            num_chunks=len(expanded_chunks),
             target_documents=step.target_documents
         )
+
+    def _expand_chunks_with_window(
+        self,
+        chunks: List[Dict],
+        verbose: bool = False
+    ) -> List[Dict]:
+        """
+        Expand retrieved chunks with neighboring chunks (sliding window).
+
+        For each retrieved chunk, includes N chunks before and after from the same document.
+        This provides complete context (e.g., full tables) while maintaining retrieval precision.
+
+        Args:
+            chunks: List of retrieved chunks
+            verbose: Print expansion details
+
+        Returns:
+            Expanded list of chunks (may contain duplicates removed)
+        """
+        if self.config.expand_context == 0:
+            return chunks
+
+        expanded = []
+        seen_chunk_ids = set()
+
+        for chunk in chunks:
+            source_file = chunk['source_file']
+            chunk_idx = chunk['chunk_index']
+
+            # Calculate window range
+            start_idx = max(0, chunk_idx - self.config.expand_context)
+            end_idx = chunk_idx + self.config.expand_context
+
+            # Query for chunks in window from same document
+            try:
+                window_results = self.processor.collection.get(
+                    where={
+                        "$and": [
+                            {"source_file": source_file},
+                            {"chunk_index": {"$gte": start_idx}},
+                            {"chunk_index": {"$lte": end_idx}}
+                        ]
+                    },
+                    include=['documents', 'metadatas']
+                )
+
+                # Add chunks from window (sorted by chunk_index to maintain order)
+                window_chunks = []
+                if window_results and window_results.get('documents'):
+                    for doc, meta in zip(window_results['documents'], window_results['metadatas']):
+                        window_chunks.append((doc, meta))
+
+                # Sort by chunk_index to maintain document order
+                window_chunks.sort(key=lambda x: x[1]['chunk_index'])
+
+                # Add to expanded list
+                for doc, meta in window_chunks:
+                    chunk_id = f"{meta['source_file']}_{meta['chunk_index']}"
+                    if chunk_id not in seen_chunk_ids:
+                        expanded.append({
+                            'text': doc,
+                            'source_file': meta['source_file'],
+                            'page_number': meta.get('page_number', 'unknown'),
+                            'chunk_index': meta['chunk_index']
+                        })
+                        seen_chunk_ids.add(chunk_id)
+
+            except Exception as e:
+                if verbose:
+                    print(f"    ⚠️  Window expansion failed for chunk {chunk_idx}: {e}")
+                # On failure, just include the original chunk
+                chunk_id = f"{chunk['source_file']}_{chunk['chunk_index']}"
+                if chunk_id not in seen_chunk_ids:
+                    expanded.append(chunk)
+                    seen_chunk_ids.add(chunk_id)
+
+        if verbose and len(expanded) > len(chunks):
+            print(f"    ✓ Expanded {len(chunks)} → {len(expanded)} chunks (±{self.config.expand_context} window)")
+
+        return expanded
 
     def _combine_results(
         self,
