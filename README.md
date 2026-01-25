@@ -119,9 +119,20 @@ The questions CSV contains:
 
 ---
 
+## PDF-to-Markdown Helper (Pandoc)
+
+If you want to convert the PDFs in `artifacts/1` to Markdown before building a QA pipeline, you can use the helper script:
+
+```bash
+scripts/convert_artifacts_pdfs.sh artifacts/1 artifacts/1/markdown
+```
+
+This uses `pandoc` with `--wrap=none` and `--extract-media` to preserve structure and extract embedded assets. Install pandoc first (see <https://pandoc.org/installing.html>).
+
+---
+
 ## Thanks
 
 We recognize that this test requires a significant amount of work. We hope you find it interesting and challenging. Thank you for your time and effort.
 
 This test is a work in progress. If anything is unclear or you have any suggestions, please reach out.
-
