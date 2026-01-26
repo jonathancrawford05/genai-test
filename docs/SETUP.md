@@ -4,7 +4,7 @@
 
 - **Python**: 3.11+
 - **Poetry**: For dependency management
-- **Ollama**: For LLM inference
+- **Ollama**: For LLM inference (llama3.2)
 
 ## Installation
 
@@ -22,11 +22,12 @@ poetry install
 ```
 
 This installs all required packages:
-- `ollama` - LLM inference
-- `chromadb` - Vector database
-- `pypdf` - PDF parsing
-- `onnxruntime` - ONNX embeddings
+- `ollama` - LLM inference (llama3.2)
+- `chromadb` - Vector database with ONNX embeddings
+- `pypdf` - PDF text extraction
+- `rank-bm25` - Keyword search for hybrid retrieval
 - `pandas` - Data analysis
+- `langchain-*` - LLM orchestration
 
 ### 3. Install and Start Ollama
 
@@ -104,11 +105,18 @@ poetry run python run_experiments.py
 ```
 
 This will:
-1. Run 4 variations on 2 test questions (8 total runs)
-2. Calculate accuracy and performance metrics
-3. Generate comparison reports in `results/` folder
+1. Run 6 variations on 2 test questions (12 total runs)
+2. Test different configurations:
+   - **Baseline**: Standard document-level chunking
+   - **High Depth**: Increased retrieval (top_k=10)
+   - **Conservative**: Reduced retrieval (top_k=3)
+   - **Sliding Window**: Document-level + ±2 chunk expansion
+   - **Page Window**: Page-level chunking + expansion
+   - **Hybrid Search**: BM25 + semantic with expansion
+3. Calculate accuracy and performance metrics
+4. Generate comparison reports in `results/` folder
 
-**Expected runtime:** 10-20 minutes total
+**Expected runtime:** 15-30 minutes total
 
 ## Project Structure
 
@@ -122,15 +130,18 @@ genai-test/
 │   ├── agents/                 # Multi-agent system
 │   │   ├── base_agent.py
 │   │   ├── router_agent.py     # Document selection
-│   │   ├── planner_agent.py    # Strategy formulation
-│   │   ├── retriever_agent.py  # Chunk retrieval
-│   │   └── orchestrator_agent.py  # Pipeline coordination
-│   ├── base_processor.py       # Base processor class
-│   └── onnx_processor.py       # ONNX embeddings
+│   │   ├── planner_agent.py    # Strategy formulation (enumeration-aware)
+│   │   ├── retriever_agent.py  # Hybrid retrieval + sliding window
+│   │   ├── orchestrator_agent.py  # Pipeline coordination
+│   │   └── document_summarizer.py # PDF summarization
+│   ├── base_processor.py       # Base processor (configurable chunking)
+│   ├── onnx_processor.py       # ONNX embeddings
+│   └── hybrid_retriever.py     # BM25 + semantic hybrid search
 ├── artifacts/
 │   ├── questions.csv           # Test questions
 │   ├── document_summaries.json # Pre-generated summaries
 │   └── 1/                      # PDF documents
+├── chroma_db/                  # ChromaDB persistent storage
 ├── results/                    # Experiment outputs
 └── docs/
     ├── architecture.md         # System architecture

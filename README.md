@@ -68,24 +68,111 @@ You may create API keys as needed, but please let us know which ones you used so
 
 ---
 
+## Implementation Overview
+
+This section describes the final architecture and key features of the implemented solution.
+
+### Multi-Agent RAG Architecture
+
+The solution uses a **4-agent pipeline** to decompose complex question-answering into specialized steps:
+
+1. **Router Agent** - Selects relevant documents from the 22 PDFs using pre-generated summaries
+2. **Planner Agent** - Creates retrieval strategies, with special handling for enumeration questions
+3. **Retriever Agent** - Executes retrieval with hybrid BM25+semantic search and sliding window expansion
+4. **Orchestrator Agent** - Synthesizes final answers from retrieved context
+
+### Key Features
+
+#### 1. Hybrid Search (BM25 + Semantic)
+
+Combines keyword-based BM25 with semantic embeddings for robust retrieval:
+- **Semantic search** - Good for conceptual queries and reasoning
+- **BM25 search** - Excellent for exact term matching, lists, enumerations
+- **Adaptive weighting** - Automatically adjusts based on query type:
+  - Enumeration queries ("list all"): 70% BM25, 30% semantic
+  - Reasoning queries: 30% BM25, 70% semantic
+- **Reciprocal Rank Fusion (RRF)** - Merges both rankings optimally
+
+#### 2. Full-Document Chunking
+
+Solves multi-page table splitting issues:
+- Extracts entire PDF text first, then chunks (chunks can span pages)
+- Preserves tables that cross page boundaries (critical for TOC tables)
+- Tracks page ranges (e.g., "3-4") for multi-page chunks
+- Alternative: Page-level chunking available for better semantic focus
+
+#### 3. Sliding Window Context Expansion
+
+Retrieves with precision, expands for context:
+- Retrieves using small chunks (1000 chars) for precise similarity matching
+- Expands with ±N neighboring chunks for complete context
+- Prevents semantic dilution from large chunks
+- Configurable expansion window (default: ±2 chunks)
+
+#### 4. Enumeration-Aware Planning
+
+Special handling for list/enumeration questions:
+- Detects patterns: "list all", "enumerate", "what are all"
+- Uses single-step broad retrieval instead of multi-step specific queries
+- Targets table of contents, indexes, comprehensive lists
+- Prevents missing items from overly specific sub-queries
+
+#### 5. Pre-Filtered Search
+
+Filters documents BEFORE semantic search, not after:
+- More efficient - only searches target documents
+- Better precision - finds chunks in tables and structured data
+- Prevents cross-document interference
+
+### Technology Stack
+
+- **Embeddings**: ONNX (all-MiniLM-L6-v2) - 384 dimensions, CPU-optimized
+- **Vector DB**: ChromaDB with persistent storage
+- **LLM**: Ollama (llama3.2) for local inference
+- **BM25**: rank-bm25 library for keyword search
+- **PDF Processing**: pypdf for text extraction
+
+### Performance Characteristics
+
+- **Indexing**: ~30-60 seconds for 22 PDFs (1500+ chunks)
+- **Query Time**: 30-90 seconds per question (4 agent steps)
+- **Accuracy**: High precision on both enumeration and reasoning questions
+- **Cost**: $0 (fully local with Ollama)
+
+---
+
 ## Part 2: Experimentation Harness
 
 ### Objective
 
 Design a small framework to evaluate multiple iterations or approaches from Part 1. Experimentation is a core part of improving generative AI systems.
 
-### Guidelines
+### Implementation
 
-1. Implement **at least 2 variations** of your PDF QA function from Part 1.
-   You may modify a single parameter, such as a prompt update or a workflow setting, for each variation.
-   The goal is not to build a completely new pipeline but to demonstrate thoughtful evaluation.
-   Each variation should be encapsulated in its own function.
+The experimentation harness tests **6 variations** across multiple dimensions:
 
-2. Your experimentation harness should:
+#### Variations Tested
 
-   * **Run all variations:** Execute each version of your PDF QA function on all provided example PDFs and questions, and record the results.
-   * **Choose evaluation metrics:** Select at least one metric you believe is relevant for measuring solution quality. You may include more if useful. Document and justify your choices.
-   * **Compare and iterate:** Provide a summary or table comparing results across iterations. Use the results to identify what works best and suggest further improvements.
+1. **Baseline** - Standard configuration (document-level chunking, no expansion)
+2. **High Depth** - Increased retrieval (top_k=10 per step)
+3. **Conservative** - Reduced retrieval for speed (top_k=3 per step)
+4. **Sliding Window** - Document-level + ±2 chunk expansion
+5. **Page Window** - Page-level chunking + ±2 chunk expansion
+6. **Hybrid Search** - Page-level + expansion + BM25+semantic hybrid search
+
+#### Evaluation Metrics
+
+1. **Exact Match** - Binary: Does answer exactly match expected output?
+2. **Partial Match Score** - Keyword overlap for list questions (e.g., 35/35 rules found)
+3. **Execution Time** - Latency in seconds
+4. **Token Efficiency** - Context size used
+
+#### Features
+
+- Runs all variations on all test questions
+- Generates CSV and Markdown comparison reports
+- Tracks successes and failures for iteration
+- Isolated configurations prevent cross-contamination
 
 
 > When recording results for each variation, be sure to capture **both successes and failures**. The metrics should clearly indicate where the solution fails so we can assess limitations and potential improvements.

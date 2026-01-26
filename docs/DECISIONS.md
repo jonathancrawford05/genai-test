@@ -168,6 +168,98 @@ for chunk in self._chunk_text(full_text):
 
 ---
 
+### Decision 5b: Sliding Window Context Expansion
+
+**Choice:** Retrieve with small chunks, expand with neighboring chunks for context
+
+**Rationale:**
+- **Semantic dilution problem discovered** - Large chunks (3000 chars) containing diverse content produce poor embeddings
+- **Precision vs context tradeoff** - Small chunks (1000 chars) for precise retrieval, but may lack complete context
+- **Best of both worlds** - Retrieve using small chunks, then expand with ±N neighbors to provide complete context
+- **Configurable window** - Default ±2 chunks balances context and noise
+
+**Problem solved:**
+Originally tried increasing chunk_size to 3000 to capture full tables. This worked for preservation but retrieval got worse - chunks containing multiple diverse sections (rules + explanations + other content) produced diluted embeddings with lower similarity scores.
+
+**Implementation:**
+```python
+# 1. Retrieve top-k chunks with small size (1000 chars) for precision
+top_chunks = semantic_search(query, top_k=5)
+
+# 2. Expand each chunk with neighbors (±2 chunks)
+for chunk in top_chunks:
+    neighbors = get_chunks_by_index(
+        source_file=chunk.source_file,
+        chunk_index_range=(chunk.index - 2, chunk.index + 2)
+    )
+    expanded_chunks.extend(neighbors)
+
+# 3. Deduplicate and sort by original chunk index
+# 4. Provide expanded context to LLM
+```
+
+**Tradeoff:**
+- ✅ **Maintains retrieval precision** - Small chunks for accurate similarity matching
+- ✅ **Provides complete context** - Neighboring chunks fill in missing information
+- ✅ **Configurable** - Can adjust window size (0 = no expansion)
+- ✅ **Preserves document order** - Chunks sorted by index, not similarity
+- ❌ More chunks sent to LLM (3-5x more context)
+- ❌ Requires global chunk indexing across documents
+
+**Impact:** Critical for maintaining both retrieval precision and context completeness.
+
+---
+
+### Decision 5c: Configurable Chunking Strategy (Page vs Document)
+
+**Choice:** Support both page-level and document-level chunking as configurable option
+
+**Rationale:**
+- **Different strategies have different tradeoffs** - Document-level preserves tables, page-level provides semantic focus
+- **Use case dependent** - Enumeration questions benefit from document-level, conceptual questions from page-level
+- **Experimentation needed** - Need to test both approaches to determine optimal strategy
+- **Simple parameter** - One flag controls entire behavior
+
+**Strategies:**
+
+**Document-Level Chunking** (chunking_strategy="document"):
+- Extracts full document first, then chunks (chunks can span pages)
+- Preserves multi-page tables and lists
+- Better for enumeration questions ("list all rules")
+- Page numbers stored as ranges (e.g., "3-4")
+
+**Page-Level Chunking** (chunking_strategy="page"):
+- Chunks each page independently
+- Chunks cannot span pages (may split tables)
+- Better semantic focus (chunks don't mix topics)
+- Better for conceptual questions
+- Page numbers always single values (e.g., "3")
+
+**Implementation:**
+```python
+# In BasePDFProcessor.__init__
+self.chunking_strategy = chunking_strategy  # "page" or "document"
+
+# In _process_single_pdf
+if self.chunking_strategy == "page":
+    return self._process_single_pdf_page_level(pdf_path)
+else:  # "document"
+    return self._process_single_pdf_document_level(pdf_path)
+```
+
+**Tradeoff:**
+- ✅ **Flexibility** - Can choose best strategy per use case
+- ✅ **Experimentation** - Easy to compare both approaches
+- ✅ **Minimal code duplication** - Shared chunking logic
+- ❌ Two code paths to maintain
+- ❌ Metadata format differs (single page vs range)
+
+**Experiment variations:**
+- "sliding_window": Document-level + expansion
+- "page_window": Page-level + expansion
+
+---
+
 ### Decision 6: Temperature = 0.0 for all agents
 
 **Choice:** Deterministic LLM calls (temperature 0)
@@ -212,30 +304,49 @@ for chunk in self._chunk_text(full_text):
 
 ## Experiment Design Decisions
 
-### Decision 8: 4 Variations Testing Retrieval Parameters
+### Decision 8: 6 Variations Testing Retrieval Strategies
 
-**Choice:** Test 4 meaningful variations focusing on retrieval depth and chunk size
+**Choice:** Test 6 meaningful variations across multiple dimensions
 
 **Rationale:**
 - **Retrieval depth matters** - Conservative vs high-depth tests precision/recall tradeoff
-- **Chunk size affects context** - 1000 vs 2000 chars tests granularity vs context
+- **Chunking strategy matters** - Page vs document level affects table preservation and semantic focus
+- **Context expansion matters** - Sliding window tests precision vs context tradeoff
+- **Search strategy matters** - Hybrid BM25+semantic vs pure semantic
 - **Baseline establishes floor** - Need reference point for comparison
-- **Focus on performance-impacting variables** - Test parameters that meaningfully affect results
 
 **Variations:**
-1. **Baseline** - Standard settings (top_k_docs=3, top_k_per_step=5, chunk_size=1000)
-2. **High depth** - Test recall improvement (top_k_docs=5, top_k_per_step=10)
-3. **Conservative** - Test speed improvement (top_k_docs=2, top_k_per_step=3)
-4. **Large chunks** - Test context improvement (chunk_size=2000)
+1. **Baseline** - Document-level, no expansion, pure semantic (top_k=5)
+2. **High Depth** - Document-level, no expansion, more retrieval (top_k=10)
+3. **Conservative** - Document-level, no expansion, less retrieval (top_k=3)
+4. **Sliding Window** - Document-level + ±2 chunk expansion (top_k=5)
+5. **Page Window** - Page-level + ±2 chunk expansion (top_k=5)
+6. **Hybrid Search** - Page-level + expansion + BM25+semantic hybrid
 
-**Previous approach:**
-Originally included "Ollama embeddings" variation, but baseline ONNX performed better and Ollama added complexity, so it was removed.
+**Evolution:**
+- **Version 1:** 4 variations testing retrieval depth and chunk size
+- **Version 2:** Removed Ollama embeddings (ONNX performed better)
+- **Version 3:** Added sliding window and page-level variations
+- **Version 4 (current):** Added hybrid search variation
+
+**Test Matrix:**
+```
+Variation       | Chunking  | Expansion | Search  | Top-K
+----------------|-----------|-----------|---------|-------
+baseline        | document  | 0         | semantic| 5
+high_depth      | document  | 0         | semantic| 10
+conservative    | document  | 0         | semantic| 3
+sliding_window  | document  | ±2        | semantic| 5
+page_window     | page      | ±2        | semantic| 5
+hybrid_search   | page      | ±2        | hybrid  | 5
+```
 
 **Tradeoff:**
-- ✅ Comprehensive comparison
-- ✅ Tests multiple hypotheses
-- ❌ 4x longer experiment time
-- ❌ More results to analyze
+- ✅ Comprehensive comparison across 4 dimensions
+- ✅ Tests complementary strategies
+- ✅ Identifies optimal configuration
+- ❌ 6x longer experiment time (~20-30 min)
+- ❌ More complex result analysis
 
 ---
 
@@ -314,6 +425,151 @@ ANSWER:
 
 ---
 
+### Decision 11: Enumeration-Aware Planning
+
+**Choice:** Add special handling for list/enumeration questions in Planner agent
+
+**Rationale:**
+- **Planner creating poor strategies** - For "List all rating plan rules", planner created overly specific multi-step plans
+- **Wrong granularity** - Plans like "Step 1: Underwriting Guidelines, Step 2: Coverage limits" missed the actual rules
+- **Query too specific** - Specific sub-queries retrieved 0 chunks, missing broad enumeration content
+- **Simple questions need simple plans** - "List all X" should use single broad retrieval, not multi-step decomposition
+
+**Problem:**
+```python
+# BAD PLAN - Too specific, misses items
+{
+  "strategy": "Break down into rule categories",
+  "steps": [
+    {"query": "Underwriting Guidelines rating rules", ...},  # 0 chunks
+    {"query": "Coverage limits rating rules", ...},          # 0 chunks
+  ],
+  "requires_combination": true
+}
+```
+
+**Solution:**
+```python
+# GOOD PLAN - Broad retrieval for enumeration
+{
+  "strategy": "Retrieve complete list from table of contents",
+  "steps": [{
+    "query": "table of contents section C rating plan rules complete list",
+    "expected_output": "Complete enumeration of all rating plan rules"
+  }],
+  "requires_combination": false
+}
+```
+
+**Implementation:**
+```python
+# 1. Detect enumeration patterns in question
+enumeration_patterns = [
+    "list all", "list the", "what are all", "enumerate",
+    "show all", "give me all", "what are the"
+]
+is_enumeration = any(pattern in question.lower() for pattern in enumeration_patterns)
+
+# 2. Add guidance to planner prompt
+if is_enumeration:
+    prompt += """
+⚠️  ENUMERATION TASK DETECTED
+- Use single-step retrieval focused on table of contents, index, or comprehensive lists
+- Query should be broad: "table of contents [topic]", "complete list of [items]"
+- Do NOT break into specific sub-categories (will miss items)
+- Set requires_combination: false
+"""
+
+# 3. Provide correct/wrong examples in system prompt
+```
+
+**Tradeoff:**
+- ✅ **Better strategies for list questions** - Single broad retrieval instead of multiple narrow ones
+- ✅ **Targets right content** - Focuses on TOC, indexes, comprehensive lists
+- ✅ **Prevents missing items** - Broad queries capture complete enumerations
+- ✅ **Simpler plans** - Single-step is faster and less error-prone
+- ❌ Pattern matching may miss edge cases
+- ❌ More complex prompt engineering
+
+**Impact:** Significantly improved retrieval for enumeration questions like "List all rating plan rules".
+
+---
+
+### Decision 12: Hybrid BM25 + Semantic Search
+
+**Choice:** Combine BM25 keyword search with semantic embeddings using Reciprocal Rank Fusion
+
+**Rationale:**
+- **Pure semantic search insufficient** - Even with improved planning, retrieval poor on keyword-heavy queries
+- **Enumeration questions keyword-heavy** - "list all rules" needs exact term matching ("C-1", "C-2", etc.)
+- **Complementary strengths** - BM25 excellent for exact terms, semantic good for concepts
+- **Adaptive weighting** - Different query types benefit from different search strategies
+
+**Problem:**
+Semantic search struggles with:
+- Exact identifiers (rule numbers like "C-1", "C-35")
+- Keyword-based enumerations (lists of specific items)
+- Table of contents queries (need exact section names)
+
+**Solution - Hybrid Retriever:**
+
+1. **Build BM25 index** from all chunks in ChromaDB
+2. **Run both searches** - semantic via ChromaDB, BM25 via rank-bm25
+3. **Merge with RRF** (Reciprocal Rank Fusion):
+   ```
+   rrf_score = alpha * (1/(k + semantic_rank)) + (1-alpha) * (1/(k + bm25_rank))
+   ```
+4. **Adaptive alpha** based on query type:
+   - Enumeration queries: alpha=0.3 (70% BM25, 30% semantic)
+   - Reasoning queries: alpha=0.7 (30% BM25, 70% semantic)
+
+**Implementation:**
+```python
+# In retriever_agent.py
+if self.config.use_hybrid and self.hybrid_retriever:
+    # Detect query type
+    is_enumeration = any(term in query_lower for term in [
+        "list", "all", "table of contents", "enumerate", "rules"
+    ])
+
+    # Set adaptive alpha
+    alpha = 0.3 if is_enumeration else 0.7
+
+    # Hybrid search
+    results = self.hybrid_retriever.search(
+        query=query,
+        top_k=top_k,
+        alpha=alpha,  # BM25-heavy for enumerations, semantic-heavy for reasoning
+        where=where_clause
+    )
+```
+
+**BM25 Tokenization:**
+```python
+def _tokenize(self, text: str) -> List[str]:
+    text = text.lower()
+    # Keep alphanumeric + hyphens (preserves "C-1", "C-35")
+    tokens = re.findall(r'\b[\w\-]+\b', text)
+    return tokens
+```
+
+**Tradeoff:**
+- ✅ **Better keyword matching** - Finds exact terms that semantic search misses
+- ✅ **Robust to query type** - Adapts weighting based on task
+- ✅ **Complementary strengths** - Gets best of both approaches
+- ✅ **Proven technique** - RRF is well-established in IR
+- ❌ Additional index to maintain (BM25)
+- ❌ Slower retrieval (2 searches + merge)
+- ❌ More complex implementation (~300 lines)
+
+**Performance:**
+- BM25 index build: ~5-10 seconds for 1500 chunks
+- Hybrid search: ~2x semantic search time (still fast at <1 second)
+
+**Impact:** Critical improvement for enumeration questions, maintains performance on reasoning questions.
+
+---
+
 ## Rejected Approaches
 
 ### Rejected 1: Single-Pass RAG
@@ -345,23 +601,40 @@ ANSWER:
 - Attempt web search for missing info
 - Query user for clarification
 
-### Open Question 2: Should we re-rank retrieved chunks?
+### ~~Open Question 2: Should we re-rank retrieved chunks?~~ ✅ RESOLVED
 
-**Current:** Trust ChromaDB's cosine similarity ranking
+**Resolution:** Implemented hybrid BM25 + semantic search with RRF (Reciprocal Rank Fusion)
 
-**Alternatives:**
-- Cross-encoder re-ranking (more accurate, slower)
-- LLM-based re-ranking (most accurate, expensive)
-- Reciprocal Rank Fusion for multi-query
+**Result:** RRF provides effective re-ranking by merging BM25 and semantic rankings. Cross-encoder re-ranking could still improve further but adds significant latency.
 
-### Open Question 3: Optimal top_k values?
+### ~~Open Question 3: Optimal top_k values?~~ ✅ PARTIALLY RESOLVED
 
-**Current:** top_k_docs=3, top_k_per_step=5
+**Current experiments test:** top_k = 3, 5, 10
+
+**Findings from experiments will determine:**
+- Does increasing top_k improve accuracy? (testing in progress)
+- What's the point of diminishing returns?
+- Does it depend on question type? (likely yes based on enumeration vs reasoning)
+
+### Open Question 4: Optimal sliding window size?
+
+**Current:** ±2 chunks (provides ~5000 chars of context)
 
 **Need experiments to determine:**
-- Does increasing top_k improve accuracy? (likely yes)
-- What's the point of diminishing returns? (test 1, 2, 3, 5, 10)
-- Does it depend on question type?
+- Does larger window improve accuracy?
+- At what point does noise outweigh signal?
+- Should window size be adaptive based on chunk similarity?
+
+### Open Question 5: Optimal hybrid alpha values?
+
+**Current:**
+- Enumeration: alpha=0.3 (70% BM25, 30% semantic)
+- Reasoning: alpha=0.7 (30% BM25, 70% semantic)
+
+**Need experiments to determine:**
+- Are these ratios optimal?
+- Should alpha be continuous based on query features?
+- Can we learn optimal alpha from training data?
 
 ---
 
@@ -372,6 +645,13 @@ ANSWER:
 3. **Search-then-filter fails on sparse text** - Pre-filtering is necessary for tables/structured data
 4. **Prompt engineering matters enormously** - Small wording changes dramatically affect results
 5. **Modular architecture pays off** - Could isolate and fix bugs in individual agents
+6. **Multi-page content is common** - Tables, lists, and sections frequently span pages in real documents
+7. **Semantic dilution is real** - Large chunks with diverse content produce poor embeddings
+8. **Sliding window is powerful** - Retrieve with precision, expand for context - best of both worlds
+9. **Query type matters** - Enumeration vs reasoning queries need different retrieval strategies
+10. **Pure semantic search insufficient** - Hybrid BM25+semantic necessary for robust retrieval
+11. **Adaptive strategies win** - Systems that adjust behavior based on query type outperform fixed approaches
+12. **Simplification improves performance** - Removing Ollama embeddings reduced complexity and improved results
 
 ---
 
@@ -383,4 +663,37 @@ ANSWER:
 
 ---
 
-**Last updated:** 2026-01-25
+## System Evolution Summary
+
+### Phase 1: Initial Multi-Agent Implementation
+- Router → Planner → Retriever → Orchestrator pipeline
+- Both ONNX and Ollama embeddings supported
+- Page-by-page chunking
+- Pure semantic search
+
+### Phase 2: Simplification and Bug Fixes
+- **Removed Ollama embeddings** - ONNX outperformed, simplified codebase
+- **Fixed multi-page table splitting** - Implemented full-document chunking
+- Single directory structure (./chroma_db)
+
+### Phase 3: Context Optimization
+- **Discovered semantic dilution** - Large chunks produce poor embeddings
+- **Implemented sliding window** - Retrieve with small chunks, expand for context
+- **Configurable chunking** - Support both page-level and document-level
+
+### Phase 4: Query-Aware Retrieval
+- **Enumeration-aware planning** - Special handling for "list all" questions
+- **Hybrid BM25 + semantic search** - Combines keyword and semantic ranking
+- **Adaptive weighting** - Adjusts search strategy based on query type
+
+### Current State (6 Variations)
+- Baseline (document, no expansion, semantic)
+- High Depth (more retrieval)
+- Conservative (less retrieval)
+- Sliding Window (document + expansion)
+- Page Window (page + expansion)
+- Hybrid Search (page + expansion + BM25)
+
+---
+
+**Last updated:** 2026-01-26
