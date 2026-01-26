@@ -51,24 +51,34 @@ Download from https://ollama.com/download
 In a separate terminal:
 
 ```bash
-# Pull LLM model for inference
+# Pull LLM model for inference (used by all agents)
 ollama pull llama3.2
+
+# Pull LLM model for document summarization (larger model for better summaries)
+ollama pull gpt-oss:20b
 ```
 
-## Generating Document Summaries
+**Note:** `gpt-oss:20b` is only needed if you want to regenerate document summaries. The repository already includes pre-generated summaries in `artifacts/document_summaries.json`.
 
-The system requires document summaries to be generated first.
+## Generating Document Summaries (Optional)
+
+The system requires document summaries for the Router agent. Pre-generated summaries are already included in `artifacts/document_summaries.json`.
+
+If you need to regenerate summaries:
 
 ```bash
-# Generate summaries for all PDFs in artifacts/1
+# Uses gpt-oss:20b model for high-quality summaries
 poetry run python -m src.agents.document_summarizer \
     --pdf-folder artifacts/1 \
     --output artifacts/document_summaries.json
 ```
 
-This takes ~10-15 minutes for 22 documents.
+**Requirements:**
+- Requires `gpt-oss:20b` model (see step 4 above)
+- Takes ~10-15 minutes for 22 documents
+- Uses larger model (20B parameters) for better summary quality
 
-**Note:** `artifacts/document_summaries.json` is already included in the repository.
+**Note:** This step is optional - the repository already includes pre-generated summaries.
 
 ## Running Part 1: PDF Question Answering
 

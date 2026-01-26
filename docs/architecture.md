@@ -55,6 +55,7 @@ This system implements a multi-agent Retrieval-Augmented Generation (RAG) pipeli
 
 #### **Phase 1: Document Summarization**
 - Pre-processing step that generates summaries for each PDF
+- Uses `gpt-oss:20b` model (larger 20B parameter model for high-quality summaries)
 - Output: `artifacts/document_summaries.json`
 - Summary schema:
   ```json
@@ -67,6 +68,7 @@ This system implements a multi-agent Retrieval-Augmented Generation (RAG) pipeli
     }
   }
   ```
+- **Note:** Pre-generated summaries included in repository; regeneration requires `ollama pull gpt-oss:20b`
 
 #### **Phase 2: Router Agent** (`src/agents/router_agent.py`)
 
