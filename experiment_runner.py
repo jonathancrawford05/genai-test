@@ -185,7 +185,7 @@ class ExperimentRunner:
                 )
             ),
 
-            # Variation 5: Page-level + sliding window (EXPECTED BEST)
+            # Variation 5: Page-level + sliding window
             VariationConfig(
                 name="page_window",
                 description="expand_context=2, page-level chunking (high precision + complete tables)",
@@ -208,6 +208,35 @@ class ExperimentRunner:
                         chunk_overlap=200,
                         expand_context=2,  # ±2 chunks sliding window
                         chunking_strategy="page"  # Page-level for semantic focus
+                    )
+                )
+            ),
+
+            # Variation 6: Hybrid BM25 + Semantic (EXPECTED BEST FOR ENUMERATIONS)
+            VariationConfig(
+                name="hybrid_search",
+                description="Hybrid BM25+semantic, page-level, adaptive alpha (BM25-heavy for lists)",
+                orchestrator_config=OrchestratorConfig(
+                    model="llama3.2",
+                    temperature=0.0,
+                    max_answer_tokens=2048,
+                    router_config=RouterConfig(
+                        model="llama3.2",
+                        top_k_docs=3,
+                        temperature=0.0
+                    ),
+                    planner_config=PlannerConfig(
+                        model="llama3.2",
+                        temperature=0.0
+                    ),
+                    retriever_config=RetrieverConfig(
+                        top_k_per_step=5,
+                        chunk_size=1000,
+                        chunk_overlap=200,
+                        expand_context=2,  # ±2 chunks sliding window
+                        chunking_strategy="page",  # Page-level for semantic focus
+                        use_hybrid=True,  # Enable hybrid search
+                        hybrid_alpha=0.5  # Balanced default (auto-adjusted per query)
                     )
                 )
             ),

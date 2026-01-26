@@ -10,6 +10,7 @@ from pathlib import Path
 from .base_agent import BaseAgent
 from .planner_agent import RetrievalPlan, RetrievalStep
 from ..onnx_processor import ONNXProcessor
+from ..hybrid_retriever import HybridRetriever
 
 
 @dataclass
@@ -41,6 +42,8 @@ class RetrieverConfig:
     chunk_overlap: int = 200  # Character overlap between chunks
     expand_context: int = 0  # Chunks before/after to include (0 = no expansion)
     chunking_strategy: str = "document"  # "page" or "document"
+    use_hybrid: bool = False  # Enable hybrid BM25 + semantic search
+    hybrid_alpha: float = 0.5  # Weight for semantic (1-alpha for BM25), 0.7 favors BM25
     model: str = "llama3.2"  # For combination/synthesis
     temperature: float = 0.0
 
@@ -92,7 +95,15 @@ class RetrieverAgent(BaseAgent):
                 self.processor.process_folder(pdf_folder)
                 print(f"✓ Indexed {self.processor.count()} chunks")
 
-        print(f"✓ Retriever initialized with ONNX embeddings ({self.processor.count()} chunks)")
+        # Initialize hybrid retriever if enabled
+        self.hybrid_retriever = None
+        if self.config.use_hybrid:
+            print(f"Building hybrid (BM25 + semantic) index...")
+            self.hybrid_retriever = HybridRetriever(self.processor)
+            self.hybrid_retriever.build_bm25_index(verbose=True)
+            print(f"✓ Retriever initialized with HYBRID search ({self.processor.count()} chunks)")
+        else:
+            print(f"✓ Retriever initialized with ONNX embeddings ({self.processor.count()} chunks)")
 
     def _create_processor(self, pdf_folder: str):
         """
@@ -209,44 +220,90 @@ class RetrieverAgent(BaseAgent):
         Returns:
             RetrievalResult with retrieved chunks
         """
-        # Pre-filtered search: only search target documents
+        # Detect enumeration queries (favor BM25 keyword matching)
+        query_lower = step.query.lower()
+        is_enumeration = any(term in query_lower for term in [
+            "list", "all", "table of contents", "index", "enumerate",
+            "rules", "complete", "comprehensive"
+        ])
+
+        # Determine search strategy
         used_prefilter = False
+        where_clause = None
 
         if step.target_documents:
-            try:
-                # Use ChromaDB's where clause to pre-filter by source_file
-                results = self.processor.collection.query(
-                    query_texts=[step.query],
-                    n_results=self.config.top_k_per_step,
-                    where={
-                        "source_file": {
-                            "$in": step.target_documents
-                        }
-                    }
-                )
-                used_prefilter = True
+            where_clause = {"source_file": {"$in": step.target_documents}}
 
-                if verbose:
-                    print(f"    Using pre-filtered search (target docs only)")
+        # Execute search (hybrid or semantic)
+        if self.config.use_hybrid and self.hybrid_retriever:
+            # Hybrid search: adjust alpha based on query type
+            alpha = self.config.hybrid_alpha
+            if is_enumeration:
+                # Favor BM25 for enumeration (lower alpha)
+                alpha = 0.3  # 70% BM25, 30% semantic
+                search_type = "HYBRID (BM25-heavy)"
+            else:
+                # Balanced or semantic-heavy for reasoning
+                alpha = 0.7  # 30% BM25, 70% semantic
+                search_type = "HYBRID (semantic-heavy)"
+
+            if verbose:
+                print(f"    Using {search_type} search (alpha={alpha:.1f})")
+
+            try:
+                results = self.hybrid_retriever.search(
+                    query=step.query,
+                    top_k=self.config.top_k_per_step,
+                    alpha=alpha,
+                    where=where_clause,
+                    verbose=verbose
+                )
+                used_prefilter = where_clause is not None
 
             except Exception as e:
-                # Fallback to search-then-filter if pre-filtering fails
                 if verbose:
-                    print(f"    ⚠️  Pre-filtered search failed: {e}")
-                    print(f"    Falling back to search-then-filter...")
-
+                    print(f"    ⚠️  Hybrid search failed: {e}")
+                    print(f"    Falling back to semantic-only...")
+                # Fallback to semantic
                 results = self.processor.query(
                     query_text=step.query,
                     top_k=self.config.top_k_per_step
                 )
                 used_prefilter = False
+
         else:
-            # No target documents specified, search everything
-            results = self.processor.query(
-                query_text=step.query,
-                top_k=self.config.top_k_per_step
-            )
-            used_prefilter = False
+            # Standard semantic-only search
+            if step.target_documents:
+                try:
+                    # Use ChromaDB's where clause to pre-filter by source_file
+                    results = self.processor.collection.query(
+                        query_texts=[step.query],
+                        n_results=self.config.top_k_per_step,
+                        where=where_clause
+                    )
+                    used_prefilter = True
+
+                    if verbose:
+                        print(f"    Using pre-filtered search (target docs only)")
+
+                except Exception as e:
+                    # Fallback to search-then-filter if pre-filtering fails
+                    if verbose:
+                        print(f"    ⚠️  Pre-filtered search failed: {e}")
+                        print(f"    Falling back to search-then-filter...")
+
+                    results = self.processor.query(
+                        query_text=step.query,
+                        top_k=self.config.top_k_per_step
+                    )
+                    used_prefilter = False
+            else:
+                # No target documents specified, search everything
+                results = self.processor.query(
+                    query_text=step.query,
+                    top_k=self.config.top_k_per_step
+                )
+                used_prefilter = False
 
         # Extract chunks with metadata
         chunks = []
