@@ -43,7 +43,7 @@ class PlannerConfig:
     """Configuration for Planner Agent."""
     model: str = "llama3.2"
     temperature: float = 0.0
-    max_tokens: int = 1024
+    max_tokens: int = 2048  # Increased from 1024 to prevent truncation
     enable_conversation: bool = True  # Allow refinement dialogue
 
 
@@ -313,14 +313,21 @@ Create a detailed retrieval plan as JSON."""
             # Parse JSON
             plan_data = json.loads(response)
 
-            # Validate required fields
-            required = ["strategy", "steps", "success_criteria"]
-            if not all(k in plan_data for k in required):
-                raise ValueError(f"Missing required fields. Got: {plan_data.keys()}")
+            # Validate required top-level fields
+            required = ["strategy", "steps"]
+            missing = [f for f in required if f not in plan_data]
+            if missing:
+                raise ValueError(f"Missing required top-level fields: {missing}. Got: {list(plan_data.keys())}")
 
-            # Parse steps
+            # Parse steps with robust error handling
             steps = []
-            for step_data in plan_data["steps"]:
+            for i, step_data in enumerate(plan_data["steps"]):
+                # Check required fields in step
+                step_required = ["step_number", "description", "target_documents", "query", "expected_output"]
+                step_missing = [f for f in step_required if f not in step_data]
+                if step_missing:
+                    raise ValueError(f"Step {i+1} missing fields: {step_missing}. Got: {list(step_data.keys())}")
+
                 step = RetrievalStep(
                     step_number=step_data["step_number"],
                     description=step_data["description"],
@@ -330,12 +337,12 @@ Create a detailed retrieval plan as JSON."""
                 )
                 steps.append(step)
 
-            # Create plan
+            # Create plan (with defaults for optional fields)
             plan = RetrievalPlan(
                 question=question,
                 strategy=plan_data["strategy"],
                 steps=steps,
-                success_criteria=plan_data["success_criteria"],
+                success_criteria=plan_data.get("success_criteria", "Successfully retrieve all required information"),
                 requires_combination=plan_data.get("requires_combination", False)
             )
 
@@ -343,7 +350,7 @@ Create a detailed retrieval plan as JSON."""
 
         except Exception as e:
             print(f"  ⚠️  Failed to parse plan: {e}")
-            print(f"     Raw response: {response[:300]}...")
+            print(f"     Raw response (first 500 chars): {response[:500]}...")
 
             # Fallback: create simple single-step plan
             print(f"     Using fallback: single-step plan")
