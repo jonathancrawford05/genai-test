@@ -3,7 +3,8 @@
     "timestamp": "2026-01-27T13:23:44.042116",
     "total_variations": 270,
     "total_questions": 2,
-    "total_runs": 540
+    "total_runs": 540,
+    "status": "Iteration 1 Complete"
   },
   "question_summaries": {
     "EF_1": {
@@ -463,6 +464,83 @@
       "Planner should generate specific queries for 'Exhibit 6 deductible factor HO3 $750,000 2%'",
       "Orchestrator few-shot examples demonstrate exhibit citation format",
       "top_k_docs=5 is required for reliable document retrieval"
+    ]
+  },
+  "validation_results": {
+    "date": "2026-01-28",
+    "description": "5-scenario validation with enhanced prompts",
+    "scenarios": [
+      {
+        "id": "S1_EF2_best",
+        "question": "EF_2",
+        "enhanced_score": 50,
+        "baseline_score": 55,
+        "change": -5
+      },
+      {
+        "id": "S2_EF2_large_chunk",
+        "question": "EF_2",
+        "enhanced_score": 55,
+        "baseline_score": 55,
+        "change": 0
+      },
+      {
+        "id": "S3_EF2_medium",
+        "question": "EF_2",
+        "enhanced_score": 60,
+        "baseline_score": 55,
+        "change": 5
+      },
+      {
+        "id": "S4_EF1_best",
+        "question": "EF_1",
+        "enhanced_score": 0,
+        "baseline_score": 75.8,
+        "change": -75.8
+      },
+      {
+        "id": "S5_EF1_window",
+        "question": "EF_1",
+        "enhanced_score": 0,
+        "baseline_score": 69.7,
+        "change": -69.7
+      }
+    ],
+    "summary": {
+      "ef2_avg_change": 0.0,
+      "ef1_avg_change": -72.8,
+      "best_ef2_improvement": "+5 points with chunk=800, top_k=3, docs=5"
+    },
+    "conclusion": "Enhanced prompts showed marginal improvement for EF_2 but significant regression for EF_1. Calculation-specific prompts conflict with enumeration task requirements."
+  },
+  "lessons_learned": {
+    "what_worked": [
+      "Component-based scoring provided clear visibility into failure modes",
+      "top_k_docs=5 is critical for multi-document questions",
+      "Larger chunk sizes (2000) better for enumeration/list tasks",
+      "Hybrid search (BM25 + semantic) with alpha=0.5 provided good balance"
+    ],
+    "what_didnt_work": [
+      "One-size-fits-all prompts: Calculation-specific guidance hurt enumeration tasks",
+      "Exhibit-specific queries did not significantly improve value extraction from tables"
+    ],
+    "root_cause": "Enhanced prompts added calculation-specific instructions that confused the model on simpler enumeration tasks without solving the fundamental table value extraction problem"
+  },
+  "next_steps": {
+    "iteration_2_high_priority": [
+      "Detect question type first (Enumeration vs Calculation vs Lookup)",
+      "Apply type-specific prompts per question type",
+      "Revert EF_1 prompts to baseline for enumeration tasks"
+    ],
+    "iteration_3_medium_priority": [
+      "Table-aware PDF parsing - extract tables as structured data",
+      "OCR enhancement for value extraction at ingestion",
+      "Preserve table structure during chunking"
+    ],
+    "iteration_4_future": [
+      "Confidence scoring to flag uncertain responses",
+      "Caching layer to reduce latency",
+      "API deployment for production integration"
     ]
   }
 }
