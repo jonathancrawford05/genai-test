@@ -4,6 +4,22 @@
 
 This framework provides deterministic, component-based evaluation for the EF_2 question (Hurricane Premium Calculation) without requiring an LLM judge.
 
+## Experiment Results Summary
+
+**Best Score Achieved:** 55/100 (multiple configurations tied)
+
+| Component | Best Score | Success Rate | Status |
+|-----------|------------|--------------|--------|
+| Document Retrieval | 20/20 | 33.3% full | ✅ Works with top_k_docs=5 |
+| Deductible ID | 20/20 | 4.4% full | ✅ Works when docs retrieved |
+| Base Rate ID | 0/20 | 0% full | ❌ **PRIMARY GAP** |
+| Factor ID | 5/20 | 0% full | ⚠️ Criteria found, value missing |
+| Calculation | 10/20 | 0% full | ⚠️ Formula correct, values wrong |
+
+**Root Cause:** Retrieval queries not specific enough to extract $293 from Exhibit 1 and 2.061 from Exhibit 6.
+
+**Fix Implemented:** Enhanced planner prompts with exhibit-specific query generation (see `src/agents/planner_agent.py`).
+
 ## Scoring Components
 
 ### Total: 100 Points

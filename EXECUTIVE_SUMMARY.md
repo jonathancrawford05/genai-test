@@ -1,7 +1,30 @@
 # GenAI Test: Multi-Agent RAG System - Executive Summary
 
-**Date:** 2026-01-26
+**Date:** 2026-01-28
 **Project:** PDF Question-Answering System with Multi-Agent RAG Architecture
+**Status:** ✅ Experiments Complete, Enhanced Prompts Implemented
+
+---
+
+## Experiment Results Summary
+
+| Question | Type | Best Score | Status |
+|----------|------|------------|--------|
+| **EF_1** | Enumeration | **75.8%** | ✅ Working well |
+| **EF_2** | Calculation | **55/100** | ⚠️ Enhanced prompts address gaps |
+
+### EF_1 Top Configuration
+- `chunk_size=2000, top_k=5, expand_context=0, hybrid_alpha=0.5`
+- Larger chunks capture more list items per retrieval
+
+### EF_2 Component Breakdown (55/100)
+| Component | Score | Status |
+|-----------|-------|--------|
+| Document Retrieval | 20/20 | ✅ Requires top_k_docs=5 |
+| Deductible ID | 20/20 | ✅ Rule C-7 + 2% found |
+| Base Rate ID | 0/20 | ❌ **PRIMARY GAP** |
+| Factor ID | 5/20 | ⚠️ Criteria found, value missing |
+| Calculation | 10/20 | ⚠️ Formula correct, values wrong |
 
 ---
 
@@ -131,26 +154,30 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 
 ## Next Steps
 
-### Immediate (Complete Experiments)
-1. ✅ **Finish running experiments** - Currently in progress with all 6 variations
-2. **Analyze results** - Compare metrics across variations to validate hypotheses
-3. **Document findings** - Add experiment results to docs/DECISIONS.md
+### Immediate (Validate Enhanced Prompts)
+1. ✅ **Experiments completed** - 270 configurations tested across 2 questions
+2. ✅ **Component scoring implemented** - EF_2 scored on 5 components (100 points total)
+3. ✅ **Enhanced prompts implemented** - Calculation-specific guidance added
+4. **Run validation experiments** - Test enhanced prompts against baseline
+   ```bash
+   # Run with top EF_2 configuration + enhanced prompts
+   python run_single_experiment.py --config chunk_400_topk_3_docs5 --question EF_2
+   ```
 
-### Short-Term (Optimize)
-4. **Tune hybrid alpha values** - Current values (0.3/0.7) are initial estimates, optimize based on experiment results
-5. **Optimize sliding window size** - Test ±1, ±2, ±3 chunks to find optimal context/noise tradeoff
-6. **Benchmark top_k values** - Determine if 3, 5, or 10 provides best accuracy/speed balance
+### Short-Term (Based on Results)
+5. **Tune exhibit-specific queries** - Current prompts suggest Exhibit 1/6 targeting
+6. **Validate base rate extraction** - Primary gap: $293 from Exhibit 1
+7. **Validate factor extraction** - Secondary gap: 2.061 from Exhibit 6
 
 ### Medium-Term (Enhance)
-7. **Implement Phase 5 - Orchestrator Agent** - Currently answer synthesis is basic, enhance with citation tracking and confidence scoring
-8. **Add cross-encoder re-ranking** - May improve precision further, though adds latency
-9. **Expand test questions** - Add more questions to `artifacts/questions.csv` for comprehensive evaluation
+8. **Add cross-encoder re-ranking** - May improve table value extraction
+9. **Implement table-aware chunking** - Preserve table structure during chunking
+10. **Expand test questions** - Add more calculation questions to validate improvements
 
 ### Long-Term (Production)
-10. **API endpoint deployment** - Wrap system in REST API for integration
-11. **Batch processing optimization** - Parallel retrieval for multiple questions
-12. **Monitoring and logging** - Track retrieval quality, latency, failure modes
-13. **Continuous improvement** - Iterate based on production usage patterns
+11. **API endpoint deployment** - Wrap system in REST API for integration
+12. **Batch processing optimization** - Parallel retrieval for multiple questions
+13. **Monitoring and logging** - Track retrieval quality, latency, failure modes
 
 ---
 
@@ -175,4 +202,41 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 
 ---
 
-**Status:** ✅ System complete and running experiments. Awaiting results for final optimization recommendations.
+**Status:** ✅ Experiments complete. Enhanced prompts implemented. Ready for validation runs.
+
+---
+
+## How to Run Validation Experiments
+
+### 1. Generate Summary from Existing Results
+```bash
+python scripts/generate_experiment_summary.py
+```
+
+### 2. Run Single Configuration Test
+```bash
+# Test EF_2 with best configuration
+python -c "
+from answer_pdf_question import answer_pdf_question
+answer = answer_pdf_question(
+    'Using the Homeowner MAPS Rate Pages and the Rules Manual, calculate the unadjusted Hurricane premium for an HO3 policy with a \$750,000 Coverage A limit. The property is located 3,000 feet from the coast in a Coastline Neighborhood.',
+    'artifacts/1'
+)
+print(answer)
+"
+```
+
+### 3. Run Full Experiment Suite
+```bash
+python experiment_runner_enhanced.py
+```
+
+### 4. Score EF_2 Results
+```bash
+python score_ef2_components.py results/detailed_results_*.json
+```
+
+### 5. Regenerate Summary
+```bash
+python scripts/generate_experiment_summary.py
+```

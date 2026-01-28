@@ -141,6 +141,52 @@ Filters documents BEFORE semantic search, not after:
 
 ---
 
+## Experiment Results
+
+### Summary (270 configurations tested)
+
+| Question | Type | Best Score | Best Configuration |
+|----------|------|------------|-------------------|
+| **EF_1** | Enumeration | **75.8%** | chunk=2000, top_k=5, docs=1 |
+| **EF_2** | Calculation | **55/100** | chunk=400-2000, top_k=1-5, docs=5 |
+
+### EF_1: List All Rating Plan Rules
+- **Best Score**: 75.8% partial match
+- **Key Finding**: Larger chunk sizes (2000) capture more list items per chunk
+- **Configuration**: `chunk_size=2000, top_k_per_step=5, expand_context=0`
+
+### EF_2: Calculate Hurricane Premium (Expected: $604)
+Component-based scoring (100 points total):
+
+| Component | Score | Status |
+|-----------|-------|--------|
+| Document Retrieval | 20/20 | ✅ Works with top_k_docs=5 |
+| Deductible ID (2%) | 20/20 | ✅ Rule C-7 found |
+| Base Rate ($293) | 0/20 | ❌ **Primary Gap** |
+| Factor (2.061) | 5/20 | ⚠️ Criteria found, value missing |
+| Calculation | 10/20 | ⚠️ Formula correct, values wrong |
+
+**Root Cause**: Retrieval queries not specific enough to extract values from Exhibit 1 and Exhibit 6.
+
+**Fix Implemented**: Enhanced planner prompts with exhibit-specific query generation (see `src/agents/planner_agent.py`).
+
+### Running Experiments
+
+```bash
+# Run full experiment suite
+python experiment_runner_enhanced.py
+
+# Score EF_2 results
+python score_ef2_components.py results/detailed_results_*.json
+
+# Generate summary
+python scripts/generate_experiment_summary.py
+```
+
+See `results/experiment_summary.json` for detailed analysis.
+
+---
+
 ## Part 2: Experimentation Harness
 
 ### Objective
