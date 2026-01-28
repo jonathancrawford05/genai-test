@@ -274,7 +274,48 @@ class OrchestratorAgent(BaseAgent):
         Returns:
             Formatted prompt
         """
-        prompt = f"""Based on the retrieved information below, answer the following question:
+        # Detect if this is a calculation question
+        question_lower = question.lower()
+        calculation_keywords = [
+            "calculate", "premium", "rate", "factor", "multiply",
+            "compute", "what is the", "how much", "total", "sum"
+        ]
+        is_calculation = any(kw in question_lower for kw in calculation_keywords)
+
+        # Add few-shot example for calculation questions
+        few_shot_section = ""
+        if is_calculation:
+            few_shot_section = """
+EXAMPLE CALCULATION QUESTION:
+
+Question: "What is the base premium for an HO3 policy with $500,000 coverage and 1% deductible in Connecticut?"
+
+Retrieved Information:
+[1] CT Homeowners MAPS Rate Pages (page 4):
+Exhibit 1 - Hurricane Base Rates by Coverage Amount
+Coverage $500,000: Base Rate $250
+
+[2] CT Homeowners MAPS Rate Pages (page 65):
+Exhibit 5 - Hurricane Deductible Factors
+HO3, $500,000, 1%: Factor 1.850
+
+Answer:
+To calculate the base premium, I need:
+
+1. Base Rate: $250 (from Exhibit 1, Page 4, for $500,000 coverage)
+2. Deductible Factor: 1.850 (from Exhibit 5, Page 65, for HO3/$500,000/1%)
+
+Calculation:
+$250 × 1.850 = $462.50
+
+Final Answer: The base premium is $462.50
+
+---
+NOW ANSWER THE ACTUAL QUESTION BELOW:
+
+"""
+
+        prompt = f"""{few_shot_section}Based on the retrieved information below, answer the following question:
 
 QUESTION: {question}
 
@@ -302,7 +343,34 @@ Guidelines:
 - If information is incomplete, clearly state what is missing
 - Do not hallucinate or make assumptions
 - Structure complex answers with bullet points or numbered lists
-- Use professional, clear language"""
+- Use professional, clear language
+
+SPECIAL INSTRUCTIONS FOR CALCULATIONS:
+
+When answering calculation questions:
+1. **Extract all numeric values** from tables, exhibits, and rate pages
+2. **Cite the source** of each value (e.g., "Base rate $293 from Exhibit 1, Page 4")
+3. **Show your work step-by-step**:
+   - Identify each required input
+   - State where you found it
+   - Perform the calculation clearly
+4. **For tables and exhibits**:
+   - Look for exhibit numbers (Exhibit 1, Exhibit 6, etc.)
+   - Look for table headers and row/column labels
+   - Match criteria carefully (coverage type, limits, deductibles)
+   - Extract exact numeric values
+
+Example structure for calculation answers:
+
+Based on the documents, I need to find:
+
+[Input 1]: $[value] from [Exhibit X, Page Y]
+[Input 2]: [value] from [Exhibit Z, Page W]
+
+Calculation:
+[Input 1] × [Input 2] = $[result]
+
+Final Answer: $[result]"""
 
     def _extract_sources(self, execution_result: ExecutionResult) -> List[Dict[str, str]]:
         """

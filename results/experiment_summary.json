@@ -1,0 +1,364 @@
+{
+  "experiment_summary": {
+    "timestamp": "2026-01-27T13:23:44.042116",
+    "total_variations": 270,
+    "total_questions": 2,
+    "total_runs": 540
+  },
+  "question_summaries": {
+    "EF_1": {
+      "question": "List all rating plan rules",
+      "type": "Enumeration/List",
+      "best_score": 0.7575757575757576,
+      "worst_score": 0.0,
+      "avg_score": 0.354433221099888
+    },
+    "EF_2": {
+      "question": "Calculate hurricane premium (Expected: $604)",
+      "type": "Calculation/Table Extraction",
+      "best_score": 0.0,
+      "worst_score": 0.0,
+      "avg_score": 0.0
+    }
+  },
+  "top_10_EF1_configurations": [
+    {
+      "rank": 1,
+      "score": 0.7575757575757576,
+      "variation_name": "chunk_2000_topk_5_window0_docs1_page",
+      "retriever_config": {
+        "chunk_size": 2000,
+        "top_k_per_step": 5,
+        "expand_context": 0,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 5
+    },
+    {
+      "rank": 2,
+      "score": 0.7575757575757576,
+      "variation_name": "chunk_2000_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "chunk_size": 2000,
+        "top_k_per_step": 5,
+        "expand_context": 0,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 5
+    },
+    {
+      "rank": 3,
+      "score": 0.7575757575757576,
+      "variation_name": "chunk_2000_topk_5_window0_docs1_document",
+      "retriever_config": {
+        "chunk_size": 2000,
+        "top_k_per_step": 5,
+        "expand_context": 0,
+        "chunking_strategy": "document",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 5
+    },
+    {
+      "rank": 4,
+      "score": 0.7575757575757576,
+      "variation_name": "chunk_2000_topk_5_window0_docs5_document",
+      "retriever_config": {
+        "chunk_size": 2000,
+        "top_k_per_step": 5,
+        "expand_context": 0,
+        "chunking_strategy": "document",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 5
+    },
+    {
+      "rank": 5,
+      "score": 0.696969696969697,
+      "variation_name": "chunk_1200_topk_5_window2_docs1_page",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 2,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 20
+    },
+    {
+      "rank": 6,
+      "score": 0.696969696969697,
+      "variation_name": "chunk_1200_topk_5_window2_docs5_page",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 2,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 20
+    },
+    {
+      "rank": 7,
+      "score": 0.696969696969697,
+      "variation_name": "chunk_1200_topk_5_window2_docs1_document",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 2,
+        "chunking_strategy": "document",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 20
+    },
+    {
+      "rank": 8,
+      "score": 0.696969696969697,
+      "variation_name": "chunk_1200_topk_5_window2_docs5_document",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 2,
+        "chunking_strategy": "document",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 20
+    },
+    {
+      "rank": 9,
+      "score": 0.6666666666666666,
+      "variation_name": "chunk_1200_topk_5_window1_docs1_page",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 1,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 13
+    },
+    {
+      "rank": 10,
+      "score": 0.6666666666666666,
+      "variation_name": "chunk_1200_topk_5_window1_docs5_page",
+      "retriever_config": {
+        "chunk_size": 1200,
+        "top_k_per_step": 5,
+        "expand_context": 1,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 13
+    }
+  ],
+  "top_10_EF2_configurations": [
+    {
+      "rank": 1,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window0_docs1_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 0,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 0
+    },
+    {
+      "rank": 2,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window1_docs1_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 1,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 0
+    },
+    {
+      "rank": 3,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window2_docs1_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 2,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 0
+    },
+    {
+      "rank": 4,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window0_docs3_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 0,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 3
+      },
+      "chunks_retrieved": 4
+    },
+    {
+      "rank": 5,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window1_docs3_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 1,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 3
+      },
+      "chunks_retrieved": 12
+    },
+    {
+      "rank": 6,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window2_docs3_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 2,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 3
+      },
+      "chunks_retrieved": 20
+    },
+    {
+      "rank": 7,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window0_docs5_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 0,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 5
+    },
+    {
+      "rank": 8,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window1_docs5_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 1,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 15
+    },
+    {
+      "rank": 9,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window2_docs5_page",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 2,
+        "chunking_strategy": "page",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 5
+      },
+      "chunks_retrieved": 25
+    },
+    {
+      "rank": 10,
+      "score": 0.0,
+      "variation_name": "chunk_400_topk_1_window0_docs1_document",
+      "retriever_config": {
+        "chunk_size": 400,
+        "top_k_per_step": 1,
+        "expand_context": 0,
+        "chunking_strategy": "document",
+        "hybrid_alpha": 0.5
+      },
+      "router_config": {
+        "top_k_docs": 1
+      },
+      "chunks_retrieved": 0
+    }
+  ],
+  "key_findings": {
+    "EF_1_enumeration": {
+      "best_configuration": {
+        "chunk_size": 2000,
+        "top_k_per_step": 5,
+        "expand_context": 0,
+        "hybrid_alpha": 0.5
+      },
+      "insight": "Larger chunk sizes (2000) perform best for enumeration tasks, capturing more list items per chunk. Window expansion (expand_context) provides diminishing returns for list tasks."
+    },
+    "EF_2_calculation": {
+      "current_status": "All configurations scored 0% - system fails to extract values from tables/exhibits",
+      "root_cause": "Prompts lack specific table extraction guidance and few-shot examples for calculation steps",
+      "proposed_fix": "Enhanced orchestrator and planner prompts with calculation-specific instructions and exhibit targeting"
+    }
+  }
+}

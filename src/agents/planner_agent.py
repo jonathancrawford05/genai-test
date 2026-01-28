@@ -214,6 +214,51 @@ Example - WRONG approach (too specific, will miss items):
   "requires_combination": true
 }
 
+SPECIAL HANDLING FOR CALCULATION QUESTIONS:
+
+When the question requires calculations or premium/rate lookups:
+1. Identify ALL required inputs (rates, factors, deductibles, etc.)
+2. Create separate steps for EACH input that needs to be found
+3. For each step:
+   - Target the specific document containing that data
+   - Query should mention: "exhibit", "table", "page", specific criteria
+   - Be very specific about what to match (coverage type, limits, percentages)
+4. Set requires_combination: false (all inputs will be in context for final answer)
+
+Example - CORRECT approach for "Calculate hurricane premium for HO3, $750,000, 2% deductible":
+{
+  "strategy": "Multi-step lookup: find base rate, then deductible factor, then calculate",
+  "steps": [
+    {
+      "step_number": 1,
+      "description": "Find hurricane base rate for $750,000 coverage",
+      "target_documents": ["CT Homeowners MAPS Rate Pages.pdf"],
+      "query": "Exhibit 1 hurricane base rate table $750,000 coverage amount",
+      "expected_output": "Base rate value for $750,000 coverage"
+    },
+    {
+      "step_number": 2,
+      "description": "Find deductible factor for HO3/$750,000/2%",
+      "target_documents": ["CT Homeowners MAPS Rate Pages.pdf"],
+      "query": "Exhibit 6 deductible factor table HO3 $750,000 2% hurricane",
+      "expected_output": "Factor value for HO3, $750,000, 2% deductible"
+    },
+    {
+      "step_number": 3,
+      "description": "Determine applicable deductible percentage from rules",
+      "target_documents": ["CT MAPS Homeowner Rules Manual.pdf"],
+      "query": "Rule C-7 hurricane deductible percentage greater than 2500 feet coastline",
+      "expected_output": "Applicable deductible percentage"
+    }
+  ],
+  "requires_combination": false
+}
+
+QUERY BEST PRACTICES FOR TABLE/EXHIBIT EXTRACTION:
+- BAD query: "hurricane deductible factors"
+- GOOD query: "Exhibit 6 page 71 table HO3 750000 2% factor"
+- Include exhibit numbers, page numbers if known, and specific criteria values
+
 Return ONLY the JSON object, no other text."""
 
     def _build_planning_prompt(
@@ -256,6 +301,13 @@ Document: {doc}
         ]
         is_enumeration = any(pattern in question_lower for pattern in enumeration_patterns)
 
+        # Detect calculation/rate questions
+        calculation_patterns = [
+            "calculate", "premium", "rate", "factor", "multiply",
+            "compute", "what is the", "how much", "total", "using the"
+        ]
+        is_calculation = any(pattern in question_lower for pattern in calculation_patterns)
+
         # Add enumeration hint if detected
         enumeration_hint = ""
         if is_enumeration:
@@ -268,8 +320,24 @@ This question asks for a complete list/enumeration.
 - Set requires_combination: false
 """
 
+        # Add calculation hint if detected
+        calculation_hint = ""
+        if is_calculation:
+            calculation_hint = """
+⚠️  CALCULATION TASK DETECTED
+This question requires extracting values from tables/exhibits for calculation.
+- Create SEPARATE steps for each required input (base rates, factors, deductible percentages)
+- Queries MUST include: exhibit numbers, table names, specific criteria (coverage type, limits, %)
+- Target Rate Pages for numeric values, Rules Manual for policy requirements
+- Example queries:
+  - "Exhibit 1 hurricane base rate $750,000 coverage amount"
+  - "Exhibit 6 deductible factor HO3 $750,000 2%"
+  - "Rule C-7 mandatory hurricane deductible coastline"
+- Set requires_combination: false (all values in context for final answer)
+"""
+
         prompt = f"""Question: "{question}"
-{enumeration_hint}
+{enumeration_hint}{calculation_hint}
 Available documents (selected by Router):
 {documents_text}
 
