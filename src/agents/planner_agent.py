@@ -181,6 +181,71 @@ Guidelines:
 - Be specific: Clear queries that will retrieve the right information
 - Be strategic: Order steps logically (dependencies first)
 
+SPECIAL HANDLING FOR LIST/ENUMERATION QUESTIONS:
+
+When the question asks to "list all", "list the", "enumerate", "what are all", or "show all":
+1. This is an ENUMERATION task - user wants a complete list, not detailed analysis
+2. Strategy: Single-step retrieval focusing on comprehensive lists or table of contents
+3. Query should target: "table of contents", "list of all", "index", "complete list", "section [X]"
+4. Do NOT break into multiple specific sub-category steps
+5. Set requires_combination: false (simple list, no synthesis needed)
+6. Keep query broad to capture the entire enumeration
+
+Example - CORRECT approach for "List all rating plan rules":
+{
+  "strategy": "Retrieve comprehensive list of rating plan rules from table of contents",
+  "steps": [{
+    "step_number": 1,
+    "description": "Retrieve complete list of all rating plan rules",
+    "target_documents": ["Homeowner Rules Manual.pdf"],
+    "query": "table of contents section C rating plan rules complete list",
+    "expected_output": "Complete enumeration of all rating plan rules (e.g., C-1, C-2, ..., C-35)"
+  }],
+  "requires_combination": false
+}
+
+SPECIAL HANDLING FOR CALCULATION/PREMIUM QUESTIONS:
+
+When the question asks to "calculate", "compute", or involves premium/rate computation:
+1. This is a MULTI-STEP CALCULATION task - break into distinct value lookups
+2. Each step should retrieve ONE specific input value needed for the formula
+3. Use targeted queries that include the exact scenario parameters (e.g., coverage amount, distance, deductible type)
+4. Set requires_combination: true (values must be combined in final calculation)
+5. Order steps so dependencies come first (base rate before applying factors)
+
+Example - CORRECT approach for "Calculate premium for HO3 with $750K coverage and 2% hurricane deductible":
+{
+  "strategy": "Look up each rate component separately, then combine for calculation",
+  "steps": [
+    {
+      "step_number": 1,
+      "description": "Look up the base rate for HO3 policy with $750,000 Coverage A",
+      "target_documents": ["Rate Pages.pdf"],
+      "query": "base rate HO3 $750,000 Coverage A limit",
+      "expected_output": "Dollar amount for the base rate at this coverage level"
+    },
+    {
+      "step_number": 2,
+      "description": "Look up the Mandatory Hurricane Deductible Factor for 2% deductible",
+      "target_documents": ["Rate Pages.pdf"],
+      "query": "mandatory hurricane deductible factor 2 percent coastline",
+      "expected_output": "Numeric multiplier for the hurricane deductible factor"
+    },
+    {
+      "step_number": 3,
+      "description": "Look up distance to coast factor for 3000 feet coastline neighborhood",
+      "target_documents": ["Rate Pages.pdf"],
+      "query": "distance to coast factor 3000 feet coastline neighborhood",
+      "expected_output": "Factor or confirmation that distance is within coastline threshold"
+    }
+  ],
+  "success_criteria": "All numeric values retrieved; ready to multiply base rate by applicable factors",
+  "requires_combination": true
+}
+
+Key principle: Each retrieval query should target a SPECIFIC value with scenario-relevant parameters.
+Avoid generic queries like "rates" or "factors" - be precise about what scenario you are looking up.
+
 Return ONLY the JSON object, no other text."""
 
     def _build_planning_prompt(
@@ -215,8 +280,44 @@ Document: {doc}
 
         documents_text = "\n\n".join(doc_info)
 
-        prompt = f"""Question: "{question}"
+        # Detect enumeration/list questions
+        question_lower = question.lower()
+        enumeration_patterns = [
+            "list all", "list the", "what are all", "enumerate",
+            "show all", "give me all", "what are the"
+        ]
+        is_enumeration = any(pattern in question_lower for pattern in enumeration_patterns)
 
+        # Detect calculation questions
+        calculation_patterns = [
+            "calculate", "compute", "what is the premium", "how much"
+        ]
+        is_calculation = any(pattern in question_lower for pattern in calculation_patterns)
+
+        # Add contextual hints based on question type
+        type_hint = ""
+        if is_enumeration:
+            type_hint = """
+⚠️  ENUMERATION TASK DETECTED
+This question asks for a complete list/enumeration.
+- Use single-step retrieval focused on table of contents, index, or comprehensive lists
+- Query should be broad: "table of contents [topic]", "complete list of [items]", "all [items]"
+- Do NOT break into specific sub-categories (will miss items)
+- Set requires_combination: false
+"""
+        elif is_calculation:
+            type_hint = """
+⚠️  CALCULATION TASK DETECTED
+This question requires extracting specific numeric values and performing a computation.
+- Break into multiple steps, one per input value (base rate, factor, deductible, etc.)
+- Each query should target a SPECIFIC value with scenario-relevant parameters from the question
+- Include numeric thresholds from the question (e.g., coverage amount, distance, deductible percentage)
+- Set requires_combination: true (values must be combined for the final calculation)
+- Order steps by dependency: base values first, then modifiers
+"""
+
+        prompt = f"""Question: "{question}"
+{type_hint}
 Available documents (selected by Router):
 {documents_text}
 
@@ -227,6 +328,8 @@ Consider:
 - Does it require information from multiple documents?
 - Are there dependencies between steps?
 - Does it involve calculations or combinations of information?
+- For LIST/ENUMERATION questions: Focus on comprehensive retrieval from indexes/TOCs
+- For CALCULATION questions: Each step should look up one specific numeric input
 
 Create a detailed retrieval plan as JSON."""
 

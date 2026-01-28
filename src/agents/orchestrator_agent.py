@@ -274,10 +274,28 @@ class OrchestratorAgent(BaseAgent):
         Returns:
             Formatted prompt
         """
+        # Detect calculation questions to add targeted guidance
+        question_lower = question.lower()
+        calculation_keywords = ["calculate", "premium", "compute", "what is the cost", "how much"]
+        is_calculation = any(kw in question_lower for kw in calculation_keywords)
+
+        calculation_hint = ""
+        if is_calculation:
+            calculation_hint = """
+⚠️  CALCULATION TASK DETECTED
+This question requires you to extract specific numeric values and perform a calculation.
+Steps:
+1. Identify EACH required input value from the context (base rate, factor, deductible %, etc.)
+2. State the exact value and its source (document name + page)
+3. Show the arithmetic step by step
+4. Present the final computed answer
+Pay special attention to tables and rate schedules - the values may be in structured rows/columns.
+"""
+
         prompt = f"""Based on the retrieved information below, answer the following question:
 
 QUESTION: {question}
-
+{calculation_hint}
 RETRIEVAL STRATEGY: {execution_result.plan_strategy}
 
 RETRIEVED INFORMATION FROM DOCUMENTS:
@@ -302,7 +320,23 @@ Guidelines:
 - If information is incomplete, clearly state what is missing
 - Do not hallucinate or make assumptions
 - Structure complex answers with bullet points or numbered lists
-- Use professional, clear language"""
+- Use professional, clear language
+
+TABLE AND RATE EXTRACTION:
+- Rate pages and tables often present data in rows/columns. Parse them carefully.
+- When you see a table, identify the column headers and row labels before extracting values.
+- Numeric values like base rates, factors, and percentages must be extracted exactly as shown.
+- Watch for values expressed as percentages (e.g., "2%") vs decimals (e.g., "0.02") vs multipliers (e.g., "2.061").
+
+CALCULATION QUESTIONS:
+- If the question asks you to calculate a premium or value, show your work step by step.
+- Identify each input value from the context and label it clearly before computing.
+- Example reasoning format:
+  1. Base Rate for [coverage/tier]: $X (from [document], page Y)
+  2. Applicable Factor: Z (from [document], page Y)
+  3. Calculation: $X × Z = $Result
+  4. Final answer: $Result (rounded as appropriate)
+- Double-check that you are applying the correct factor for the specific scenario described."""
 
     def _extract_sources(self, execution_result: ExecutionResult) -> List[Dict[str, str]]:
         """
