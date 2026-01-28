@@ -128,18 +128,23 @@ def run_scenario(scenario: dict) -> dict:
     start = time.time()
     try:
         from src.agents import OrchestratorAgent
-        agent = OrchestratorAgent(config=orchestrator_config)
+        # OrchestratorAgent requires summaries_path and pdf_folder in __init__
+        agent = OrchestratorAgent(
+            summaries_path="artifacts/document_summaries.json",
+            pdf_folder="artifacts/1",
+            config=orchestrator_config
+        )
         result = agent.answer_question(
             question=q,
-            pdfs_folder="artifacts/1",
-            summaries_path="artifacts/document_summaries.json",
-            verbose=False
+            verbose=True
         )
         answer = result.answer
         error = None
     except Exception as e:
         answer = f"ERROR: {e}"
         error = str(e)
+        import traceback
+        traceback.print_exc()
 
     elapsed = time.time() - start
 
