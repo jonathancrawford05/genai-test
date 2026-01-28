@@ -373,9 +373,9 @@ def analyze_results(json_path: str, output_csv: str = None) -> pd.DataFrame:
 
             # Reasoning
             "doc_retrieval_reason": reasoning["document_retrieval"],
-            "deductible_reason": reasoning["deductible_identification"],
-            "base_rate_reason": reasoning["base_rate_identification"],
-            "factor_reason": reasoning["factor_identification"],
+            "deductible_id_reason": reasoning["deductible_identification"],
+            "base_rate_id_reason": reasoning["base_rate_identification"],
+            "factor_id_reason": reasoning["factor_identification"],
             "calculation_reason": reasoning["calculation"],
 
             # Metadata
