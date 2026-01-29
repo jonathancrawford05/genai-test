@@ -223,6 +223,10 @@ The experimentation harness tests **6 variations** across multiple dimensions:
 
 > When recording results for each variation, be sure to capture **both successes and failures**. The metrics should clearly indicate where the solution fails so we can assess limitations and potential improvements.
 
+### A/B Testing Framework (EF1 and EF2)
+
+For a decoding-parameter A/B testing framework tailored to Ollama + llama3.2 (covering both creative and high-precision scenarios), see `docs/ab_testing_framework.md`.
+
 ---
 
 ## Example Questions
