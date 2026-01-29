@@ -1,0 +1,68 @@
+{
+  "example_homeowner_rules.pdf": {
+    "filename": "example_homeowner_rules.pdf",
+    "total_pages": 108,
+    "generated_by": "llama3.2",
+    "summary": "Contains underwriting rules and eligibility criteria for homeowners insurance in Connecticut, including property type restrictions, occupancy requirements, and coverage limits.",
+    "use_for": "Questions about underwriting guidelines, eligibility requirements, property restrictions, endorsement rules, or policy coverage limits. Helps determine if a property qualifies for coverage and what rules apply.",
+    "key_topics": [
+      "underwriting rules",
+      "eligibility criteria",
+      "property types",
+      "occupancy requirements",
+      "coverage limits",
+      "endorsements",
+      "exclusions",
+      "territorial restrictions"
+    ],
+    "document_type": "rules_manual"
+  },
+  "example_rate_pages.pdf": {
+    "filename": "example_rate_pages.pdf",
+    "total_pages": 252,
+    "generated_by": "llama3.2",
+    "summary": "Rate tables and premium calculation factors for homeowners insurance policies, organized by tier, protection class, deductible, and coverage amount.",
+    "use_for": "Questions about premium calculations, rate tables, pricing factors, or looking up specific rates based on territory, protection class, deductible percentage, and coverage amount. Used for calculating policy premiums.",
+    "key_topics": [
+      "rate tables",
+      "premium calculation",
+      "base rates",
+      "deductible factors",
+      "protection class",
+      "tier pricing",
+      "coverage amounts",
+      "territory factors"
+    ],
+    "document_type": "rate_pages"
+  },
+  "example_actuarial_memo.pdf": {
+    "filename": "example_actuarial_memo.pdf",
+    "total_pages": 2,
+    "generated_by": "llama3.2",
+    "summary": "Actuarial justification and methodology explanation for proposed rate changes, including loss ratios, trend factors, and rate level indications.",
+    "use_for": "Questions about rate filing methodology, actuarial justification, loss experience, trend factors, or why rates are changing. Provides technical background on rate development.",
+    "key_topics": [
+      "rate methodology",
+      "loss ratios",
+      "trend factors",
+      "rate indications",
+      "credibility",
+      "experience period"
+    ],
+    "document_type": "actuarial_memo"
+  },
+  "example_checklist.pdf": {
+    "filename": "example_checklist.pdf",
+    "total_pages": 8,
+    "generated_by": "llama3.2",
+    "summary": "Review checklist for regulatory compliance verification, listing required filing components and documentation requirements.",
+    "use_for": "Questions about filing requirements, regulatory compliance, required documentation, or what components must be included in a rate or rule filing.",
+    "key_topics": [
+      "filing requirements",
+      "compliance checklist",
+      "required documentation",
+      "regulatory review"
+    ],
+    "document_type": "checklist"
+  }
+}

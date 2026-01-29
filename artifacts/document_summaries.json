@@ -1,0 +1,390 @@
+{
+  "(129371443-179747531)-Miccolis ILF paper.pdf": {
+    "summary": "A technical paper outlining the mathematical theory and practical consistency tests for increased limits and excess of loss pricing, including anti‑selection effects and lognormal loss modeling.",
+    "use_for": "Supports underwriting and rating decisions by providing: 1) consistency criteria for two‑dimensional increased limits tables; 2) guidance on evaluating anti‑selection impact on I.L.F. calculations; 3) methods for incorporating trend and inflation into loss severity models; 4) reference formulas for marginal premium analysis and excess of loss pricing.",
+    "key_topics": [
+      "Increased Limits Tables",
+      "Consistency Tests (marginal premium)",
+      "Anti‑Selection Effects",
+      "Excess of Loss Pricing",
+      "Lognormal Loss Distribution",
+      "Trend and Inflation Adjustment",
+      "Occurrence vs Aggregate Limits"
+    ],
+    "document_type": "actuarial_memo",
+    "filename": "(129371443-179747531)-Miccolis ILF paper.pdf",
+    "total_pages": 14,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(213435472-179483955)-Actuarial Checklist.pdf": {
+    "summary": "A compliance checklist for actuaries filing rate and rating information with the Connecticut Insurance Department, covering required exhibits, models, and documentation for personal lines.",
+    "use_for": "Supports underwriting and rating decisions by verifying that all mandated actuarial data—rate level indications, GLM and non‑GLM model narratives, territorial and base rate calculations, expense and loss development factors, reinsurance cost treatment, and premium adjustment histories—are complete and compliant with state regulations.",
+    "key_topics": [
+      "Rate Level Indications",
+      "GLM and Non‑GLM Model Documentation",
+      "Territorial and Base Rate Calculations",
+      "Expense and Loss Development Factors",
+      "Reinsurance Cost Treatment",
+      "Premium Adjustment Histories",
+      "Regulatory Compliance Checklist"
+    ],
+    "document_type": "checklist",
+    "filename": "(213435472-179483955)-Actuarial Checklist.pdf",
+    "total_pages": 6,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(213435473-179483956)-Checklist - HO Coastal - May 2022.pdf": {
+    "summary": "A 4‑page homeowner coastal insurance compliance checklist issued by Connecticut in May 2022, detailing required policy elements, hurricane deductible limits, trigger definitions, and SERFF tracking requirements.",
+    "use_for": "Supports underwriting and rating decisions by verifying policy compliance with Connecticut coastal regulations, ensuring correct hurricane deductible application, trigger timing, and mandatory documentation; aids in audit, filing rejection avoidance, and policy issuance approvals.",
+    "key_topics": [
+      "Coastal eligibility & county coverage",
+      "Hurricane deductible limits (≤5%)",
+      "Hurricane trigger definitions & timing",
+      "SERFF state tracking number requirement",
+      "Policy form/page/paragraph compliance references",
+      "Underwriting coastal guidelines",
+      "Declarations page disclosure",
+      "Compliance audit checklist"
+    ],
+    "document_type": "checklist",
+    "filename": "(213435473-179483956)-Checklist - HO Coastal - May 2022.pdf",
+    "total_pages": 4,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(213435474-179483964)-Checklist - HO Rates.pdf": {
+    "summary": "A compliance checklist for Connecticut homeowner rate filings, detailing statutory, regulatory, and departmental requirements that must be met for rate changes and underwriting guidelines.",
+    "use_for": "Supports rate filing approval by verifying compliance with flex rate limits, credit history provisions, underwriting tier definitions, rate profile submissions, effective dates, and SERFF filing numbers; aids underwriters and rating teams in documenting and justifying rate changes and underwriting criteria.",
+    "key_topics": [
+      "Flex Rate Provisions (CGS §38a-688a)",
+      "Credit History Exemptions",
+      "Underwriting Guidelines & Tier Placement",
+      "Rate Profile Exhibits (PDF & Excel)",
+      "Effective Dates for New Business & Renewals",
+      "Rate Impacts by Policy Form",
+      "SERFF Filing Requirements",
+      "General Information & Explanatory Memorandum"
+    ],
+    "document_type": "checklist",
+    "filename": "(213435474-179483964)-Checklist - HO Rates.pdf",
+    "total_pages": 3,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(213435475-179483982)-Checklist - HO Rules - May 2022.pdf": {
+    "summary": "A compliance checklist for Connecticut personal‑lines homeowner rule filings, detailing required confirmations, references to statutes and regulations, and supplemental AI usage questions.",
+    "use_for": "Supports underwriting and rating decisions by verifying adherence to state statutes, ensuring proper use of insurance scores, fee inclusion, coverage limits, disclosure requirements, and AI/machine‑learning vetting; aids regulators and insurers in filing review and rejection avoidance.",
+    "key_topics": [
+      "Compliance verification",
+      "Insurance score usage",
+      "Fee and administrative cost inclusion",
+      "Coverage limits (B, C)",
+      "Disclosure of premium savings",
+      "AI/machine‑learning usage",
+      "State statutes and regulations",
+      "Filing documentation requirements"
+    ],
+    "document_type": "checklist",
+    "filename": "(213435475-179483982)-Checklist - HO Rules - May 2022.pdf",
+    "total_pages": 8,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(213435477-179484094)-CT MAPS Home Rate.Rule Filing eff 8.18.25 Cover Letter.pdf": {
+    "summary": "Cover letter from American Commerce Insurance Company to the Connecticut Insurance Department announcing the launch of the MAPS (MAPFRE Adaptive Pricing System) homeowner rating plan effective 8/18/2025, referencing supporting actuarial documents and filing identifiers.",
+    "use_for": "Supports underwriting and rating decisions by providing the effective date and scope of the new MAPS plan, identifying the filing and tracking numbers for regulatory compliance, and linking to the associated actuarial memorandum, rule manual, rate order of calculation, and rate manual for detailed rate and rule information.",
+    "key_topics": [
+      "MAPS rating plan",
+      "effective date 08/18/2025",
+      "American Commerce Insurance Company",
+      "Connecticut Insurance Department",
+      "SERFF tracking numbers (AMEC-134363726, AMEC-134363566, AMEC-134363729)",
+      "Actuarial Memorandum",
+      "rule manual",
+      "rate order of calculation",
+      "rate manual",
+      "contact information"
+    ],
+    "document_type": "forms",
+    "filename": "(213435477-179484094)-CT MAPS Home Rate.Rule Filing eff 8.18.25 Cover Letter.pdf",
+    "total_pages": 1,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933333-180358021)-CT Homeowners MAPS Tier Rate Pages Eff 8.18.25.pdf": {
+    "summary": "The document contains Connecticut homeowners MAPS rate tables effective 8/18/2025, detailing factor bands, policy form smoker adjustments, and rate multipliers for HO3, HO4, and HO6 policies.",
+    "use_for": "Supports underwriting and rating decisions by providing the exact rate factors and band thresholds needed to calculate premiums, determine rate adjustments for smokers, and apply policy‑specific multipliers in the underwriting workflow.",
+    "key_topics": [
+      "Rate factor tables",
+      "Policy form smoker factor",
+      "HO3 / HO4 / HO6 policy types",
+      "Factor band thresholds",
+      "Effective date",
+      "American Commerce Insurance / MAPFRE Insurance",
+      "Premium calculation rules"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933333-180358021)-CT Homeowners MAPS Tier Rate Pages Eff 8.18.25.pdf",
+    "total_pages": 60,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933334-180357948)-Actuarial Memorandum v2.pdf": {
+    "summary": "An actuarial memorandum introducing the MAPS (MAPFRE Adaptive Pricing System) homeowners rating plan for Connecticut, detailing its modeling approach, multi‑peril rating structure, new rating variables from Cape Analytics and CoreLogic, and confidentiality requests.",
+    "use_for": "Supports underwriting and pricing decisions by answering questions such as: What are the differences between MAPS and LEGACY plans? How are frequency and severity modeled? Which new rating variables are included and how do they affect rates? What data is confidential and why? How does MAPS achieve rate‑neutral change?",
+    "key_topics": [
+      "MAPS rating plan",
+      "LEGACY rating plan",
+      "GLM modeling",
+      "multi‑peril rating structure",
+      "Cape Analytics variables",
+      "CoreLogic variables",
+      "confidentiality request"
+    ],
+    "document_type": "actuarial_memo",
+    "filename": "(214933334-180357948)-Actuarial Memorandum v2.pdf",
+    "total_pages": 2,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933335-180357999)-CT ACIC MAPS HO Rate Profile 08_18_25 v2.pdf": {
+    "summary": "The document presents current and proposed homeowners insurance rates for Connecticut counties and zip codes, organized by coverage bands and limits, as issued by the ACIC MAPS program.",
+    "use_for": "It supports underwriting and pricing decisions by providing specific premium amounts for each county/zip code and coverage band, enabling comparison of current versus proposed rates, determining rate changes, calculating premiums for policy quotes, and assessing compliance with ACIC MAPS rate guidelines.",
+    "key_topics": [
+      "Homeowners insurance rates",
+      "Coverage limits ($100k–$700k)",
+      "County and zip code identifiers",
+      "Rate bands (e.g., 2–3 miles, 5+ miles from shore)",
+      "Current vs. proposed rates",
+      "ACIC MAPS program",
+      "Premium calculation",
+      "Underwriting criteria"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933335-180357999)-CT ACIC MAPS HO Rate Profile 08_18_25 v2.pdf",
+    "total_pages": 26,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933336-180358134)-Exhibit I - Non-Modeled Factors.pdf": {
+    "summary": "A Connecticut homeowners rate filing that provides rate tables and adjustment factors for HO3, HO4, and HO6 policies, including smoker status, protection class, coverage limits, and deductible adjustments.",
+    "use_for": "Supports underwriting and pricing decisions by supplying specific rate multipliers for smoker/non‑smoker status, protection class classifications, coverage limits, and deductible levels for HO4/HO6 policies, enabling accurate premium calculation and rate approval.",
+    "key_topics": [
+      "Smoker/Nonsmoker factor",
+      "Protection class factor (Frame, Log Home, Manufactured, Masonry, etc.)",
+      "Coverage limit / deductible factor tables for HO4 and HO6",
+      "ISO SERFF reference and legacy factor calculations",
+      "Premium adjustment multipliers for homeowners insurance"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933336-180358134)-Exhibit I - Non-Modeled Factors.pdf",
+    "total_pages": 36,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933336-180358135)-Exhibit II - Price Modeled vs Selected-2025_04_25.pdf": {
+    "summary": "MAPFRE Insurance Exhibit II presents the modeled versus selected pricing factors for Connecticut homeowners policies (HO3 and HO5) effective 8/18/2025, detailing coverage A limits, deductibles, and rate adjustments for other peril and theft perils, along with explanations of model deviations.",
+    "use_for": "Supports underwriting and rating decisions by providing the final selected rates, highlighting deviations from the statistical model, and enabling actuaries to justify rate changes, assess the impact of coverage limits and deductibles on pricing, and ensure compliance with regulatory filings.",
+    "key_topics": [
+      "Modeled vs Selected Factors",
+      "Coverage A Limits",
+      "Deductible Levels",
+      "Other Peril Rates",
+      "Theft Peril Rates",
+      "Spline and Reversal Corrections",
+      "HO3 and HO5 Policy Forms",
+      "Rate Tables and Adjustments"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933336-180358135)-Exhibit II - Price Modeled vs Selected-2025_04_25.pdf",
+    "total_pages": 13,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933336-180358136)-Exhibit III - Pure Premium vs Proposed Premium Relativity v2.pdf": {
+    "summary": "Exhibit III presents a decile‑based comparison of pure premium relativity versus proposed premium relativity for the Connecticut Homeowners MAPS rate filing, using five years of loss data capped at 25% of Coverage A.",
+    "use_for": "Supports underwriting and rating decisions by showing how exposure risk is distributed across deciles, aiding rate justification, compliance review, and determination of rate adjustments for the 8/18/2025 effective period.",
+    "key_topics": [
+      "Pure Premium Relativity",
+      "Proposed Premium Relativity",
+      "Decile Analysis",
+      "Loss Cap (25% of Coverage A)",
+      "MAPS Rate Filing",
+      "Connecticut Homeowners",
+      "Effective Date 8/18/2025",
+      "Data Source (5 years to 12/31/2023)"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933336-180358136)-Exhibit III - Pure Premium vs Proposed Premium Relativity v2.pdf",
+    "total_pages": 1,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933339-180358240)-CT Home Objection Response Public 2024_02_13.pdf": {
+    "summary": "A CT Homeowners MAPS rate rule filing that addresses regulatory objections, provides actuarial qualifications, clarifies rating variable definitions, and outlines product transition details for new and legacy policies.",
+    "use_for": "Supports underwriting and pricing decisions by answering questions about rating variable eligibility, bias mitigation, data governance, product eligibility, and transition between legacy and new MAPS Homeowner products. Useful for validating model assumptions, ensuring compliance with ASOP standards, and determining policy pricing and eligibility.",
+    "key_topics": [
+      "Actuarial qualifications and credentials",
+      "Rating variables and bias/unintentional discrimination",
+      "Data governance and ASOP compliance",
+      "Product transition: legacy vs. new MAPS Homeowner",
+      "Definitions of PNI, Financial Merit Score, pre‑program losses",
+      "Smoker/Non‑Smoker and Prior Homeowner Carrier data",
+      "Regulatory objection responses",
+      "Rate rule filing and SERFF tracking"
+    ],
+    "document_type": "rate_rule_filing",
+    "filename": "(214933339-180358240)-CT Home Objection Response Public 2024_02_13.pdf",
+    "total_pages": 6,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933339-180358241)-CT MAPS Home 8-18-25 Expected Expense Exhibit.pdf": {
+    "summary": "An expected expense exhibit for Connecticut homeowners multiple peril insurance, detailing written and earned premium, expense percentages (commissions, acquisition, general, taxes), profit/contingency, and projected loss and LAE ratios for the 2025 effective year.",
+    "use_for": "Supports underwriting and rate‑setting decisions by providing historical and projected expense structures, loss‑ratio expectations, and profitability metrics; enables analysts to benchmark expense ratios, assess profitability thresholds, and justify rate adjustments.",
+    "key_topics": [
+      "Written Premium",
+      "Earned Premium",
+      "Commissions",
+      "Other Acquisition Expense",
+      "General Expense",
+      "Taxes, Licenses & Fees",
+      "Profit and Contingency",
+      "Total Expenses",
+      "Expected Loss and LAE Ratio",
+      "CT ACIC data",
+      "Insurance Expense Exhibit – Part III"
+    ],
+    "document_type": "actuarial_exhibit",
+    "filename": "(214933339-180358241)-CT MAPS Home 8-18-25 Expected Expense Exhibit.pdf",
+    "total_pages": 1,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933339-180358242)-Filing Road Map.pdf": {
+    "summary": "A filing road map for MAPFRE Insurance’s Connecticut Homeowners rate proposal, detailing factor sources, GLM references, and exhibit links for HO3, HO4/HO6 policies, including base rates, coverage limits, endorsements, and discounts.",
+    "use_for": "Supports underwriting and rating decisions by mapping each underwriting factor to its source (GLM, exhibit, or judgmentally selected), verifying rate neutrality, determining tier movements, and ensuring compliance with the proposed effective date. Useful for actuaries setting rates, underwriters evaluating policy features, and compliance officers reviewing factor documentation.",
+    "key_topics": [
+      "Rate Filing",
+      "HO3 / HO4 / HO6 factors",
+      "GLM (Generalized Linear Models)",
+      "Exhibit references",
+      "Base rates and tier factors",
+      "Coverage limits and endorsements",
+      "Discounts (affinity, association, account)",
+      "Protective device factors"
+    ],
+    "document_type": "rate_filing_document",
+    "filename": "(214933339-180358242)-Filing Road Map.pdf",
+    "total_pages": 3,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(214933339-180358243)-Red Line ROC.pdf": {
+    "summary": "A rate schedule enumerating factor tables for property insurance per peril, coverage limits, deductibles, geographic and structural modifiers, protective device discounts, endorsement add‑ons, and umbrella coverage.",
+    "use_for": "Supports underwriting and pricing decisions by providing the specific rate multipliers and flat amounts used to calculate premiums for each peril, coverage limit, deductible, geographic factor, protective device, discount, endorsement, and umbrella product. It enables actuaries and underwriters to answer questions such as \"What is the premium impact of adding a sprinkler system?\", \"How does the hurricane deductible factor affect the final rate?\", or \"What is the combined endorsement discount for a gated community?\".",
+    "key_topics": [
+      "Base rate tables",
+      "Coverage limit and deductible factors",
+      "Geographic modifiers (territory, distance to coast)",
+      "Protective device discounts (fire alarm, sprinkler, lightning, gated community)",
+      "Endorsement and umbrella premium calculations"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(214933339-180358243)-Red Line ROC.pdf",
+    "total_pages": 2,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(215004842-180407997)-Trampoline Support.pdf": {
+    "summary": "A support table for trampoline coverage in the Connecticut Homeowners HO3 program, showing earned exposures, earned premium rerated at the proposed rate level, incurred losses, loss ratios, and loss ratio relativity over three fiscal years.",
+    "use_for": "Supports underwriting and pricing decisions by providing exposure, premium, and loss data for trampoline coverage; enables calculation of loss ratios, comparison of actual versus proposed rates, and assessment of rate relativity for rate setting and risk management.",
+    "key_topics": [
+      "Trampoline coverage",
+      "Earned exposures",
+      "Earned premium rerated at proposed rate level",
+      "Incurred losses",
+      "Incurred loss ratio",
+      "Loss ratio relativity",
+      "Connecticut Homeowners HO3 program",
+      "Three fiscal years"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(215004842-180407997)-Trampoline Support.pdf",
+    "total_pages": 1,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(215004842-180408051)-CT Homeowner Objection Response 04.23.25.pdf": {
+    "summary": "A response to objections filed for the Connecticut Homeowners MAPS rate rule, detailing updates to cancellation, financial merit, coverage limits, and trampoline surcharge provisions.",
+    "use_for": "Supports underwriting and rating decisions by clarifying compliance with state regulations, defining minimum coverage limits, outlining cancellation avoidance language, specifying financial merit scoring rules, and justifying trampoline surcharge data for policy renewals.",
+    "key_topics": [
+      "Rule B-3 cancellations",
+      "Rule B-10 financial merit scoring",
+      "Rule C-1 limits of liability",
+      "Rule C-23 trampoline factor",
+      "Coverage limits for HO3 policies",
+      "Aerial imagery data for trampoline support",
+      "Cancellation avoidance notice",
+      "Financial Merit score assignment"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(215004842-180408051)-CT Homeowner Objection Response 04.23.25.pdf",
+    "total_pages": 2,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf": {
+    "summary": "The document contains rate tables and coverage details for Connecticut Homeowners insurance policies issued by MAPS, American Commerce Insurance Company, and MAPFRE Insurance, including premium rates, deductibles, coverage limits, and discount codes.",
+    "use_for": "Answering underwriting and pricing queries such as: determining base premium for a specific policy type (e.g., HO3, HO4, HO6), calculating coverage limits and deductibles for property and liability, applying association or association discount codes, computing loss assessment coverage, and assessing guaranteed replacement cost rates. Supports rate selection, policy issuance, and risk management decisions.",
+    "key_topics": [
+      "HO3 policy rates",
+      "HO4 policy rates",
+      "HO6 policy rates",
+      "discount codes",
+      "deductible factors",
+      "coverage limits",
+      "loss assessment coverage",
+      "guaranteed replacement cost"
+    ],
+    "document_type": "rate_pages",
+    "filename": "(215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf",
+    "total_pages": 252,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(215066178-180449588)-CT MAPS Homeowner Rules Manual eff 08.18.25 v4.pdf": {
+    "summary": "The Connecticut MAPS Homeowner Rules Manual is a comprehensive guide outlining coverage provisions, endorsements, discounts, payment plans, and underwriting criteria for the MAPS Homeowners program.",
+    "use_for": "Supports underwriting and rating decisions by providing specific eligibility rules for endorsements (e.g., Special Personal Property, Ordinance or Law Increase), discount qualification criteria (protective devices, year built factor), payment plan structures, and policy form limitations. It enables agents and underwriters to determine coverage options, premium calculations, and compliance with program requirements.",
+    "key_topics": [
+      "Coverage endorsements (HC 15, HO 04 77)",
+      "Protective device discounts (sprinkler, alarm, gated community)",
+      "Year Built factor",
+      "Payment plans and fee schedules",
+      "Policy form restrictions (HO 00 03, HO 00 04, HO 00 06)",
+      "Ordinance or Law increased coverage limits",
+      "Special Personal Property coverage",
+      "Discount tables and eligibility"
+    ],
+    "document_type": "rules_manual",
+    "filename": "(215066178-180449588)-CT MAPS Homeowner Rules Manual eff 08.18.25 v4.pdf",
+    "total_pages": 108,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(215066178-180449602)-CT Legacy Homeowner Rules eff 04.01.24 mu to MAPS Homeowner Rules eff 8.18.25 v3.pdf": {
+    "summary": "Rules manual for the Connecticut MAPS Homeowners Program, detailing underwriting guidelines, coverage options, market tier assignment, mitigation requirements, and rating references.",
+    "use_for": "Supports underwriting decisions, rating calculations, coverage eligibility checks, tier assignment, mitigation factor application, endorsement selection, and compliance verification for Connecticut homeowners policies.",
+    "key_topics": [
+      "Underwriting Guidelines",
+      "Coverage C & D limits",
+      "Market Tier Factors",
+      "Windstorm Mitigation",
+      "Special Personal Property Coverage",
+      "Financial Merit Rule",
+      "Age of First Named Insured",
+      "Claim Points"
+    ],
+    "document_type": "rules_manual",
+    "filename": "(215066178-180449602)-CT Legacy Homeowner Rules eff 04.01.24 mu to MAPS Homeowner Rules eff 8.18.25 v3.pdf",
+    "total_pages": 70,
+    "generated_by": "gpt-oss:20b"
+  },
+  "(summary_document_AMEC-134363726_2025-06-06)-AMEC-134363726.pdf": {
+    "summary": "This document is the official filing of the Connecticut Homeowner MAPS Rate Rule Manual and associated rate pages, including updated schedules, mitigation factors, and endorsement provisions effective 08/18/2025.",
+    "use_for": "It supports underwriting and pricing decisions by providing the current rate rule structure, rate tables, and mitigation factor calculations; it also informs compliance with state filing requirements, assists actuaries in rate validation, and guides agents on available endorsements and coverage limits.",
+    "key_topics": [
+      "CT Homeowner MAPS Rate Rule Manual",
+      "Rate schedules and tables",
+      "Mitigation factors (e.g., fire alarm, sprinkler, windstorm, hurricane shutters)",
+      "Endorsements and optional coverages (e.g., computer coverage, replacement cost settlement)",
+      "Effective date and filing information"
+    ],
+    "document_type": "rate_rule_manual",
+    "filename": "(summary_document_AMEC-134363726_2025-06-06)-AMEC-134363726.pdf",
+    "total_pages": 61,
+    "generated_by": "gpt-oss:20b"
+  }
+}

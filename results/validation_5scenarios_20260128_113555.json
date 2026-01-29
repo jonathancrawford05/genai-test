@@ -1,0 +1,124 @@
+{
+  "timestamp": "2026-01-28T11:35:55.863221",
+  "description": "5 scenario validation with enhanced prompts",
+  "results": [
+    {
+      "scenario_id": "S1_EF2_best",
+      "question_id": "EF_2",
+      "config": {
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need:\n\n1. Base Rate: Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages.\n   [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\n   Exhibit 19\n   Policy Form\n   Coverage D \n   Percentage of \n   Base Coverage \n   Minimum\n   Coverage D \n   Percentage of \n   Base Coverage \n   Maximum\n   Fire Water Non-\n   Weather Water Weather Wind/Hail Hurr...",
+      "scores": {
+        "doc": 20,
+        "deduct": 20,
+        "base": 5,
+        "factor": 5,
+        "calc": 0,
+        "total": 50
+      },
+      "baseline_score": 55,
+      "improvement": -5,
+      "execution_time": 107.10665082931519,
+      "error": null
+    },
+    {
+      "scenario_id": "S2_EF2_large_chunk",
+      "question_id": "EF_2",
+      "config": {
+        "chunk_size": 2000,
+        "top_k": 1,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, located 3,000 feet from the coast in a Coastline Neighborhood, we need to follow the multi-step calculation task outlined above.\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nFrom Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), we find that:\n\n* Coverage D is not directly applicable to our scenario, as we are looking for an HO3 policy.\n* However, we can see that there is a table w...",
+      "scores": {
+        "doc": 20,
+        "deduct": 20,
+        "base": 5,
+        "factor": 0,
+        "calc": 10,
+        "total": 55
+      },
+      "baseline_score": 55,
+      "improvement": 0,
+      "execution_time": 72.23067021369934,
+      "error": null
+    },
+    {
+      "scenario_id": "S3_EF2_medium",
+      "question_id": "EF_2",
+      "config": {
+        "chunk_size": 800,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I will follow the steps below:\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nFrom Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), I found that there is no specific table or exhibit for $750,000 coverage. However, I can infer that the rates are progressive and increase as the coverage amount increases.\n\nSince the closes...",
+      "scores": {
+        "doc": 20,
+        "deduct": 20,
+        "base": 5,
+        "factor": 5,
+        "calc": 10,
+        "total": 60
+      },
+      "baseline_score": 55,
+      "improvement": 5,
+      "execution_time": 76.65392112731934,
+      "error": null
+    },
+    {
+      "scenario_id": "S4_EF1_best",
+      "question_id": "EF_1",
+      "config": {
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules directly from the provided document excerpts. The table of contents mentioned in the retrieval strategy suggests that such a list might be available, but it is not explicitly stated in the text.\n\nHowever, I can suggest some possible ways to identify rating plan rules:\n\n* Review the \"Rate Pages\" section for specific rate tables and schedules\n* Examine the \"Exhibit\" sections for detailed descriptions...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "percent": 0.0
+      },
+      "baseline_score": 75.8,
+      "improvement": -75.8,
+      "execution_time": 34.42464828491211,
+      "error": null
+    },
+    {
+      "scenario_id": "S5_EF1_window",
+      "question_id": "EF_1",
+      "config": {
+        "chunk_size": 1200,
+        "top_k": 5,
+        "expand": 2,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules directly from the provided document excerpts. The table of contents mentioned in the retrieval strategy suggests that such a list might be available, but it is not explicitly stated in the text.\n\nHowever, I can suggest some possible ways to identify rating plan rules:\n\n* Review the \"Rate Pages\" section for specific rate tables and schedules\n* Examine the \"Exhibit\" sections for detailed descriptions...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "percent": 0.0
+      },
+      "baseline_score": 69.7,
+      "improvement": -69.7,
+      "execution_time": 35.38434624671936,
+      "error": null
+    }
+  ],
+  "summary": {
+    "ef2_avg_improvement": 0.0,
+    "ef1_avg_improvement": -72.75
+  }
+}
