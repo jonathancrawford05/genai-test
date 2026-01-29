@@ -139,7 +139,45 @@ Summarize A/B results per track/question:
 - Sample outputs (1–2 per track)
 - Any failure modes
 
-## Next Steps
-- Add a small **EF1 list scorer** to compute coverage/precision automatically.
-- Integrate runs into `results/` with consistent JSON logging.
-- If true beam search is required, evaluate a llama.cpp runtime that exposes it and keep Ollama as the baseline.
+## Experiment Results (2026-01-28)
+
+### Summary (40 tests: 2 questions × 2 tracks × 5 configs × 2 variants)
+
+| Question | Track | Variant A | Variant B | Delta | Winner |
+|----------|-------|-----------|-----------|-------|--------|
+| EF_1 | Creative | **32.0%** | 17.7% | -14.3 | **A** |
+| EF_1 | Precision | 17.2% | 17.7% | +0.6 | B |
+| EF_2 | Creative | 53/100 | **57/100** | +4.0 | **B** |
+| EF_2 | Precision | 53/100 | **55/100** | +2.0 | **B** |
+
+### Best Individual Results
+- **EF_1**: 82.9% coverage (creative-A, chunk=2000, top_k=5)
+- **EF_2**: 60/100 (multiple configs with creative track)
+
+### Key Findings
+
+1. **EF_1 (Enumeration)**:
+   - Moderate temperature (0.7) significantly outperforms high creativity (0.9)
+   - Pure deterministic decoding (temp=0.0) underperforms moderate creativity
+   - Best results achieved with creative-A settings
+
+2. **EF_2 (Calculation)**:
+   - Slightly higher temperature (0.9) improves scores
+   - Variant B consistently wins across both tracks
+   - Deterministic decoding (temp=0.0) is not optimal for calculations
+
+3. **General Insights**:
+   - Optimal decoding parameters are task-dependent
+   - One-size-fits-all decoding settings are suboptimal
+   - Enumeration tasks prefer controlled randomness, calculations benefit from exploration
+
+### Results File
+Full results available in: `results/ab_test_20260128_210315.json`
+
+---
+
+## Future Enhancements (Not Implemented)
+- **Beam search emulation** via multi-sample voting
+- **LLM-as-judge** for qualitative evaluation
+- **Additional metrics**: fluency, diversity, hallucination rate
+- **Cross-encoder re-ranking** for improved retrieval

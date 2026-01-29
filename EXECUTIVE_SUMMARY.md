@@ -37,6 +37,35 @@
 | Factor ID | 5-10/20 | ⚠️ Some improvement |
 | Calculation | 10/20 | ⚠️ Formula correct, values inconsistent |
 
+### A/B Testing: Decoding Parameter Evaluation (40 tests)
+
+Tested top 5 configurations from EF_1 and EF_2 with creative vs high-precision decoding parameters.
+
+**Decoding Parameters:**
+| Track | Variant | temperature | top_k | top_p |
+|-------|---------|-------------|-------|-------|
+| Creative | A (baseline) | 0.7 | 40 | 0.9 |
+| Creative | B (variant) | 0.9 | 80 | 0.95 |
+| Precision | A (baseline) | 0.0 | 1 | 1.0 |
+| Precision | B (variant) | 0.2 | 10 | 0.9 |
+
+**Results Summary:**
+| Question | Track | Variant A | Variant B | Winner |
+|----------|-------|-----------|-----------|--------|
+| EF_1 | Creative | **32.0%** | 17.7% | **A** |
+| EF_1 | Precision | 17.2% | 17.7% | B |
+| EF_2 | Creative | 53/100 | **57/100** | **B** |
+| EF_2 | Precision | 53/100 | **55/100** | **B** |
+
+**Best Individual Results:**
+- **EF_1**: 82.9% (creative-A, chunk=2000) - *exceeds baseline 75.8%*
+- **EF_2**: 60/100 (multiple configs) - *matches enhanced prompt results*
+
+**Key Insights:**
+1. **EF_1 (Enumeration)**: Moderate temperature (0.7) outperforms high creativity (0.9). Pure deterministic (0.0) underperforms.
+2. **EF_2 (Calculation)**: Slightly higher temperature (0.9) helps. Variant B consistently wins.
+3. **Question-type sensitivity**: Optimal decoding differs by task - enumeration prefers controlled creativity, calculations benefit from slight randomness.
+
 ---
 
 ## Lessons Learned
@@ -47,6 +76,8 @@
 3. **Larger chunks (2000)** - Better for enumeration/list tasks
 4. **Hybrid search** - BM25 + semantic with alpha=0.5 provided good balance
 5. **Enumeration detection** - Single-step broad retrieval worked well
+6. **Moderate temperature (0.7)** - Best for enumeration tasks in A/B testing
+7. **Slight randomness for calculations** - temp=0.9 improved EF_2 scores
 
 ### What Didn't Work
 1. **One-size-fits-all prompts** - Calculation guidance hurt enumeration tasks
@@ -211,6 +242,7 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 - [x] Component-based scoring for EF_2 implemented
 - [x] Enhanced prompts for calculation questions tested
 - [x] Validation experiments run (5 scenarios)
+- [x] A/B testing for decoding parameters (40 tests across 2 tracks)
 - [x] Results documented and analyzed
 
 ## Files for Reference
@@ -218,10 +250,13 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 | File | Purpose |
 |------|---------|
 | `results/experiment_summary.json` | Full experiment analysis |
+| `results/ab_test_20260128_210315.json` | A/B testing results (decoding parameters) |
 | `ef2_component_scores.csv` | Component-level EF_2 scoring |
 | `results/validation_5scenarios_*.json` | Validation experiment results |
+| `scripts/run_ab_test.py` | A/B testing script |
 | `scripts/test_5_scenarios.py` | Validation test script |
 | `scripts/generate_experiment_summary.py` | Summary generation script |
+| `docs/ab_testing_framework.md` | A/B testing framework documentation |
 
 ---
 
@@ -243,6 +278,7 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 3. **Sliding window wins** - Retrieve with precision, expand for context—best of both worlds
 4. **Simplification improves performance** - Removing Ollama embeddings reduced complexity and improved results
 5. **Adaptive strategies outperform fixed approaches** - Systems that adjust behavior based on query type are more robust
+6. **Decoding parameters matter** - Optimal temperature differs by task type; one-size-fits-all decoding is suboptimal
 
 ---
 
@@ -253,6 +289,9 @@ Part 2 implementation tests 6 meaningful variations across 4 dimensions:
 ```bash
 # Run 5-scenario validation test
 python scripts/test_5_scenarios.py
+
+# Run A/B testing (decoding parameters)
+python scripts/run_ab_test.py
 
 # Regenerate experiment summary
 python scripts/generate_experiment_summary.py
@@ -266,4 +305,4 @@ python experiment_runner_enhanced.py
 
 ---
 
-**Iteration 1 Status:** ✅ Complete. Results documented. Ready for Iteration 2 (question-type routing).
+**Iteration 1 Status:** ✅ Complete. All experiments run, results documented, ready for evaluation.

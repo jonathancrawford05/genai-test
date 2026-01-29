@@ -322,6 +322,7 @@
     "summary": "The document contains rate tables and coverage details for Connecticut Homeowners insurance policies issued by MAPS, American Commerce Insurance Company, and MAPFRE Insurance, including premium rates, deductibles, coverage limits, and discount codes.",
     "use_for": "Answering underwriting and pricing queries such as: determining base premium for a specific policy type (e.g., HO3, HO4, HO6), calculating coverage limits and deductibles for property and liability, applying association or association discount codes, computing loss assessment coverage, and assessing guaranteed replacement cost rates. Supports rate selection, policy issuance, and risk management decisions.",
     "key_topics": [
+      "Homeowners (HO) Base Rates including Hurricane Cover",
       "HO3 policy rates",
       "HO4 policy rates",
       "HO6 policy rates",

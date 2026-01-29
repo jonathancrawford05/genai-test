@@ -1,0 +1,1423 @@
+{
+  "metadata": {
+    "timestamp": "2026-01-28T21:03:15.425764",
+    "questions": [
+      "EF_1",
+      "EF_2"
+    ],
+    "tracks": [
+      "creative",
+      "precision"
+    ],
+    "total_tests": 40
+  },
+  "decoding_variants": {
+    "creative": {
+      "A": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "B": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      }
+    },
+    "precision": {
+      "A": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "B": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      }
+    }
+  },
+  "summary": {
+    "by_question": {
+      "EF_1": {
+        "creative": {
+          "variant_A_avg": 32.0,
+          "variant_B_avg": 17.7,
+          "delta": -14.3,
+          "winner": "A"
+        },
+        "precision": {
+          "variant_A_avg": 17.2,
+          "variant_B_avg": 17.7,
+          "delta": 0.6,
+          "winner": "B"
+        }
+      },
+      "EF_2": {
+        "creative": {
+          "variant_A_avg": 53.0,
+          "variant_B_avg": 57.0,
+          "delta": 4.0,
+          "winner": "B"
+        },
+        "precision": {
+          "variant_A_avg": 53.0,
+          "variant_B_avg": 55.0,
+          "delta": 2.0,
+          "winner": "B"
+        }
+      }
+    },
+    "by_track": {}
+  },
+  "results": [
+    {
+      "run_id": "ef_1-creative-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs1_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules as per the retrieval strategy. The provided context does not include a table of contents or any explicit mention of a document containing rating plan rules.\n\nHowever, I can suggest some possible ways to approach finding the rating plan rules:\n\n* Review the documents for any appendices or supplements that may contain additional information on rating plans.\n* Check if the rating plan rules are includ...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 33.144644260406494,
+      "error": null,
+      "timestamp": "2026-01-28T19:57:13.634348"
+    },
+    {
+      "run_id": "ef_1-creative-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "Based on the provided documents, here are the rating plan rules listed:\n\n**General Rating Plan Rules**\n\n1. **Rule B-1: Change of Residence Premises** (Page 7)\n2. **Rule B-2: Small Premium Adjustments** (Page 8)\n3. **Rule B-3: Cancellations** (Page 9)\n4. **Rule B-4: Non-Renewals** (Page 10)\n5. **Rule B-5: Interpolation** (Page 11)\n6. **Rule B-6: Policy Period** (Page 12)\n7. **Rule B-7: Whole Dollar Premium Rule** (Page 13)\n8. **Rule B-8: Coverage Limit Factors** (Page 14)\n9. **Rule B-9: Protectio...",
+      "scores": {
+        "rules_found": 27,
+        "total_rules": 35,
+        "coverage": 77.1,
+        "score": 77.1
+      },
+      "execution_time": 76.69467687606812,
+      "error": null,
+      "timestamp": "2026-01-28T19:58:30.339978"
+    },
+    {
+      "run_id": "ef_1-creative-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs1_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "Based on the provided retrieval strategy, I was unable to retrieve a comprehensive list of rating plan rules as no explicit document or table of contents were provided. The retrieved information does not include any specific content related to rating plan rules.\n\nHowever, I can suggest some possible steps to obtain this information:\n\n* Review the Table of Contents (TOC) for any sections related to \"Rating Plans\" or \"Rate Planning\".\n* Check Exhibits and Appendices for any relevant documents.\n* Ve...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 34.74753403663635,
+      "error": null,
+      "timestamp": "2026-01-28T19:59:05.097931"
+    },
+    {
+      "run_id": "ef_1-creative-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "Based on the retrieved information, here are the rating plan rules listed:\n\n**Section C - Rating Plan (Rules C-1 to C-35)**\n\n* Rule C-1: Limits of Liability and Coverage Relationships (Page 17)\n* Rule C-2: Rating Perils (Page 18)\n* Rule C-3: Base Rates (Page 19)\n* Rule C-4: Policy Type Factor (Page 20)\n* Rule C-5: Policy Tier Guidelines (Page 21)\n* Rule C-6: Amount of Insurance/Deductibles (Page 22)\n* Rule C-7: Hurricane Deductibles (Page 23)\n* Rule C-8: Windstorm/Hail Deductibles (Page 24)\n* Ru...",
+      "scores": {
+        "rules_found": 29,
+        "total_rules": 35,
+        "coverage": 82.9,
+        "score": 82.9
+      },
+      "execution_time": 74.09103989601135,
+      "error": null,
+      "timestamp": "2026-01-28T20:00:19.198716"
+    },
+    {
+      "run_id": "ef_1-creative-A-chunk_1200_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_1200_topk_5_window2_docs1_page",
+      "retriever_config": {
+        "name": "chunk_1200_topk_5_window2_docs1_page",
+        "chunk_size": 1200,
+        "top_k": 5,
+        "expand": 2,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "Unfortunately, I do not have access to the retrieved information from the documents as it was not provided in your message. The instruction \"RETRIEVE COMPREHENSIVE LIST OF RATING PLAN RULES FROM TABLE OF CONTENTS\" does not include any actual text or document excerpts.\n\nHowever, based on general insurance underwriting practices and rating plan structures, I can provide a hypothetical answer for the sake of completion:\n\n**Please note that this answer is speculative and may not reflect the actual r...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 47.58391809463501,
+      "error": null,
+      "timestamp": "2026-01-28T20:01:06.794852"
+    },
+    {
+      "run_id": "ef_1-creative-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs1_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules in the provided documents, specifically under \"RETRIEVAL STRATEGY: Retrieve comprehensive list of rating plan rules from table of contents\". However, I can suggest possible steps to locate this information:\n\nTo find the complete list of rating plan rules, it is recommended to:\n\n* Check the Table of Contents (TOC) for relevant sections or chapters\n* Look for specific exhibits or appendices related t...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 42.43835186958313,
+      "error": null,
+      "timestamp": "2026-01-28T20:01:49.245713"
+    },
+    {
+      "run_id": "ef_1-creative-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "Based on the provided document excerpts, here are the rating plan rules listed:\n\n**General Rules**\n\n1. B-1 Change of Residence Premises (page 7)\n2. B-2 Small Premium Adjustments (page 8)\n3. B-3 Cancellations (page 9)\n4. B-4 Non-Renewals (page 10)\n5. B-5 Interpolation (page 11)\n6. B-6 Policy Period (page 12)\n7. B-7 Whole Dollar Premium Rule (page 13)\n8. B-8 Coverage Limit Factors (page 14)\n9. B-9 Protection Classification Definitions (page 15)\n10. B-10 Financial Merit Rule (page 16)\n\n**Rating Pla...",
+      "scores": {
+        "rules_found": 16,
+        "total_rules": 35,
+        "coverage": 45.7,
+        "score": 45.7
+      },
+      "execution_time": 84.01167893409729,
+      "error": null,
+      "timestamp": "2026-01-28T20:03:13.306483"
+    },
+    {
+      "run_id": "ef_1-creative-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs1_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "Based on the retrieved information, I am unable to provide a comprehensive list of rating plan rules as no document excerpt was provided to retrieve the necessary information.\n\n\nPlease provide the relevant document excerpts or clarify if any additional context can be used to answer this question.",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 37.714017152786255,
+      "error": null,
+      "timestamp": "2026-01-28T20:03:51.033428"
+    },
+    {
+      "run_id": "ef_1-creative-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "Based on the retrieved information, here are the listed rating plan rules as per the document excerpts:\n\n**Section B - General Rules**\n\n1. Rule B-1: Change of Residence Premises (Page 7)\n2. Rule B-2: Small Premium Adjustments (Page 8)\n3. Rule B-3: Cancellations (Page 9)\n4. Rule B-4: Non-Renewals (Page 10)\n5. Rule B-5: Interpolation (Page 11)\n6. Rule B-6: Policy Period (Page 12)\n7. Rule B-7: Whole Dollar Premium Rule (Page 13)\n8. Rule B-8: Coverage Limit Factors (Page 14)\n9. Rule B-9: Protection ...",
+      "scores": {
+        "rules_found": 15,
+        "total_rules": 35,
+        "coverage": 42.9,
+        "score": 42.9
+      },
+      "execution_time": 91.46819400787354,
+      "error": null,
+      "timestamp": "2026-01-28T20:05:22.523361"
+    },
+    {
+      "run_id": "ef_1-creative-B-chunk_1200_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_1200_topk_5_window2_docs1_page",
+      "retriever_config": {
+        "name": "chunk_1200_topk_5_window2_docs1_page",
+        "chunk_size": 1200,
+        "top_k": 5,
+        "expand": 2,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "Unfortunately, no comprehensive list of rating plan rules was retrieved from the provided documents as it was mentioned to retrieve a \"comprehensive list\" but only a table of contents was mentioned. However, I can provide you with an empty list since no specific information about the rating plan rules was provided.\n\n\n**Retrieved Information: Empty List**\n\n* No relevant details or information were found in the documents regarding rating plan rules.\n \n\nPlease note that without access to the comple...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 44.44736099243164,
+      "error": null,
+      "timestamp": "2026-01-28T20:06:06.980860"
+    },
+    {
+      "run_id": "ef_1-precision-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs1_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules directly from the provided document excerpts. The table of contents mentioned in the retrieval strategy suggests that such a list might be available, but it is not explicitly stated in the text.\n\nHowever, I can suggest some possible ways to identify rating plan rules:\n\n* Review the \"Rate Pages\" section for specific rate tables and schedules\n* Examine the \"Exhibit\" sections for detailed descriptions...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 45.80925393104553,
+      "error": null,
+      "timestamp": "2026-01-28T20:06:52.803956"
+    },
+    {
+      "run_id": "ef_1-precision-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "Based on the retrieved information, here are the rating plan rules listed:\n\n**Section B - General Rules**\n\n1. Rule B-1 Change of Residence Premises (Page 7)\n2. Rule B-2 Small Premium Adjustments (Page 8)\n3. Rule B-3 Cancellations (Page 9)\n4. Rule B-4 Non-Renewals (Page 10)\n5. Rule B-5 Interpolation (Page 11)\n6. Rule B-6 Policy Period (Page 12)\n7. Rule B-7 Whole Dollar Premium Rule (Page 13)\n8. Rule B-8 Coverage Limit Factors (Page 14)\n9. Rule B-9 Protection Classification Definitions (Page 15)\n1...",
+      "scores": {
+        "rules_found": 15,
+        "total_rules": 35,
+        "coverage": 42.9,
+        "score": 42.9
+      },
+      "execution_time": 89.31315612792969,
+      "error": null,
+      "timestamp": "2026-01-28T20:08:22.131008"
+    },
+    {
+      "run_id": "ef_1-precision-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs1_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules directly from the provided document excerpts. The table of contents mentioned in the retrieval strategy suggests that such a list might be available, but it is not explicitly stated in the text.\n\nHowever, I can suggest some possible ways to identify rating plan rules:\n\n* Review the \"Rate Pages\" section for specific rate tables and schedules\n* Examine the \"Exhibit\" sections for detailed descriptions...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 45.45144200325012,
+      "error": null,
+      "timestamp": "2026-01-28T20:09:07.592249"
+    },
+    {
+      "run_id": "ef_1-precision-A-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_5_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "Based on the retrieved information, here are the rating plan rules listed:\n\n**Section B - General Rules**\n\n1. Rule B-1 Change of Residence Premises (Page 7)\n2. Rule B-2 Small Premium Adjustments (Page 8)\n3. Rule B-3 Cancellations (Page 9)\n4. Rule B-4 Non-Renewals (Page 10)\n5. Rule B-5 Interpolation (Page 11)\n6. Rule B-6 Policy Period (Page 12)\n7. Rule B-7 Whole Dollar Premium Rule (Page 13)\n8. Rule B-8 Coverage Limit Factors (Page 14)\n9. Rule B-9 Protection Classification Definitions (Page 15)\n1...",
+      "scores": {
+        "rules_found": 15,
+        "total_rules": 35,
+        "coverage": 42.9,
+        "score": 42.9
+      },
+      "execution_time": 95.16211104393005,
+      "error": null,
+      "timestamp": "2026-01-28T20:10:42.763519"
+    },
+    {
+      "run_id": "ef_1-precision-A-chunk_1200_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_1200_topk_5_window2_docs1_page",
+      "retriever_config": {
+        "name": "chunk_1200_topk_5_window2_docs1_page",
+        "chunk_size": 1200,
+        "top_k": 5,
+        "expand": 2,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules directly from the provided document excerpts. The table of contents mentioned in the retrieval strategy suggests that such a list might be available, but it is not explicitly stated in the text.\n\nHowever, I can suggest some possible ways to identify rating plan rules:\n\n* Review the \"Rate Pages\" section for specific rate tables and schedules\n* Examine the \"Exhibit\" sections for detailed descriptions...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 48.030770778656006,
+      "error": null,
+      "timestamp": "2026-01-28T20:11:30.810466"
+    },
+    {
+      "run_id": "ef_1-precision-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs1_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "Unfortunately, the retrieved information does not provide a comprehensive list of rating plan rules. The provided document excerpts do not contain a table of contents or any explicit mention of rating plan rules.\n\nHowever, I can suggest some possible sources where these rules might be found:\n\n* Exhibit 1 (Page 3): This exhibit may contain policy terms and conditions, which could include some rating plan rules.\n* Exhibit 2 (Page 5): This exhibit may outline premium calculation methods or rate str...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 45.9870719909668,
+      "error": null,
+      "timestamp": "2026-01-28T20:12:16.810187"
+    },
+    {
+      "run_id": "ef_1-precision-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "Based on the retrieved information, here are the rating plan rules listed:\n\n**Section B - General Rules**\n\n1. Rule B-1 Change of Residence Premises (Page 7)\n2. Rule B-2 Small Premium Adjustments (Page 8)\n3. Rule B-3 Cancellations (Page 9)\n4. Rule B-4 Non-Renewals (Page 10)\n5. Rule B-5 Interpolation (Page 11)\n6. Rule B-6 Policy Period (Page 12)\n7. Rule B-7 Whole Dollar Premium Rule (Page 13)\n8. Rule B-8 Coverage Limit Factors (Page 14)\n9. Rule B-9 Protection Classification Definitions (Page 15)\n1...",
+      "scores": {
+        "rules_found": 16,
+        "total_rules": 35,
+        "coverage": 45.7,
+        "score": 45.7
+      },
+      "execution_time": 96.40491509437561,
+      "error": null,
+      "timestamp": "2026-01-28T20:13:53.227084"
+    },
+    {
+      "run_id": "ef_1-precision-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs1_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs1_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 1,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules in the provided documents. The table of contents only mentions \"Rating Plan\" without specifying the content or listing individual rules.\n\nHowever, I can suggest that the rating plan rules might be found in specific sections or exhibits within the document, but this cannot be confirmed without further review.\n\nIf you could provide more context or clarify which section or exhibit contains the rating ...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 42.684324979782104,
+      "error": null,
+      "timestamp": "2026-01-28T20:14:35.922614"
+    },
+    {
+      "run_id": "ef_1-precision-B-chunk_2000_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_5_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_2000_topk_5_window0_docs5_document",
+        "chunk_size": 2000,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "Based on the retrieved information, here are the rating plan rules listed:\n\n**Section C \u2013 Rating Plan**\n\n1. **C-1 Limits of Liability and Coverage Relationships**: Page 17\n\t* Rule for coverage relationships and limits\n2. **C-2 Rating Perils**: Page 18\n\t* List of perils subject to rating\n3. **C-3 Base Rates**: Page 19\n\t* Base rates for different forms types (e.g., HO 00 03, HO 00 04)\n4. **C-4 Policy Type Factor**: Page 20\n\t* Factors affecting policy type and rate\n5. **C-5 Policy Tier Guidelines**...",
+      "scores": {
+        "rules_found": 15,
+        "total_rules": 35,
+        "coverage": 42.9,
+        "score": 42.9
+      },
+      "execution_time": 95.236971616745,
+      "error": null,
+      "timestamp": "2026-01-28T20:16:11.170330"
+    },
+    {
+      "run_id": "ef_1-precision-B-chunk_1200_topk_5_wi",
+      "question_id": "EF_1",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_1200_topk_5_window2_docs1_page",
+      "retriever_config": {
+        "name": "chunk_1200_topk_5_window2_docs1_page",
+        "chunk_size": 1200,
+        "top_k": 5,
+        "expand": 2,
+        "docs": 1,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "Based on the retrieved information, I was unable to find a comprehensive list of rating plan rules in the provided document excerpts. The table of contents only mentions \"Rating Plan\" but does not provide a detailed list of rules.\n\nHowever, I can suggest some possible steps to identify the rating plan rules:\n\n* Review Exhibit 1 (Page 3) for any relevant sections or subsections related to the rating plan.\n* Check Table 2 (Page 5) for coverage types and limits, which may be part of the rating plan...",
+      "scores": {
+        "rules_found": 0,
+        "total_rules": 35,
+        "coverage": 0.0,
+        "score": 0.0
+      },
+      "execution_time": 46.22354292869568,
+      "error": null,
+      "timestamp": "2026-01-28T20:16:57.404693"
+    },
+    {
+      "run_id": "ef_2-creative-A-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_400_topk_3_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_document",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need to follow these steps:\n\nStep 1: Find base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages\nI need to find the base rate for $750,000 coverage limit. Since there is no direct information about the $750,000 coverage limit, I will check if there are any other relevant rates.\n\n[1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\nExhibit 19\nPolicy Fo...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 112.41570210456848,
+      "error": null,
+      "timestamp": "2026-01-28T20:18:49.829863"
+    },
+    {
+      "run_id": "ef_2-creative-A-chunk_2000_topk_1_wi",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_1_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_1_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 1,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I need:\n\n1. Base Rate: Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages.\n\n[Source: Exhibit 19, Policy Form, Coverage D, Percentage of Base Coverage Minimum/Maximum on page 162 of (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf]\n\nThe relevant section is:\n\nHO3 30.00 40.00 1.0225 1.0225 1.02...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 0,
+        "total": 45,
+        "score": 45
+      },
+      "execution_time": 141.8524420261383,
+      "error": null,
+      "timestamp": "2026-01-28T20:21:11.703764"
+    },
+    {
+      "run_id": "ef_2-creative-A-chunk_800_topk_1_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_800_topk_1_window1_docs5_document",
+      "retriever_config": {
+        "name": "chunk_800_topk_1_window1_docs5_document",
+        "chunk_size": 800,
+        "top_k": 1,
+        "expand": 1,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I need:\n\n1. Base Rate for $750,000 coverage limit:\n   - Unfortunately, I couldn't find the base rate for $750,000 coverage in Exhibit 1 of the Homeowners MAPS Rate Pages (page 161). It only lists rates up to $500,000.\n\n2. Deductible Factor for HO3 policy with a 2% deductible is not applicable since the policy has a 3% deductible:\n   - Bas...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 0,
+        "total": 45,
+        "score": 45
+      },
+      "execution_time": 119.87261509895325,
+      "error": null,
+      "timestamp": "2026-01-28T20:23:11.586218"
+    },
+    {
+      "run_id": "ef_2-creative-A-chunk_400_topk_5_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_400_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_5_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I need to follow the multi-step calculation task outlined in the provided information. Here's my step-by-step approach:\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nAccording to Exhibit 19 on page 162 of the Homeowners MAPS Rate Pages (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf, there is no specific ...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 10,
+        "total": 60,
+        "score": 60
+      },
+      "execution_time": 126.81239604949951,
+      "error": null,
+      "timestamp": "2026-01-28T20:25:18.410633"
+    },
+    {
+      "run_id": "ef_2-creative-A-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "A",
+      "config_name": "chunk_400_topk_3_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.7,
+        "top_k": 40,
+        "top_p": 0.9,
+        "repeat_penalty": 1.1,
+        "seed": 42
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need to:\n\n**Step 1: Find base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages**\n\n[1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\nExhibit 19\nPolicy Form\nCoverage D \nPercentage of \nBase Coverage \nMinimum\nCoverage D \nPercentage of \nBase Coverage \nMaximum\nFire Water Non-\nWeather Water Weather Wind/Hail Hurricane Liability Other Theft\nHO3 30.00 40.0...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 10,
+        "total": 60,
+        "score": 60
+      },
+      "execution_time": 133.0000081062317,
+      "error": null,
+      "timestamp": "2026-01-28T20:27:31.433319"
+    },
+    {
+      "run_id": "ef_2-creative-B-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_400_topk_3_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_document",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I will follow the multi-step calculation task.\n\n**Step 1: Find base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages**\n\nThe document [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162) contains Exhibit 19 Policy Form Coverage D Percentage of Base Coverage Minimum Coverage D Percentage of Bas...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 10,
+        "total": 60,
+        "score": 60
+      },
+      "execution_time": 129.96661186218262,
+      "error": null,
+      "timestamp": "2026-01-28T20:29:41.432420"
+    },
+    {
+      "run_id": "ef_2-creative-B-chunk_2000_topk_1_wi",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_1_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_1_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 1,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, located 3,000 feet from the coast in a Coastline Neighborhood, I need to:\n\n1. Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages.\n2. Determine the deductible factor for an HO3 policy with 2% deductible (missing information: how does this deductibility apply to a 1% deductible).\n3. Find the applicable coastline deductible percentage from CT MAPS Homeowner Rules Manual.\n\nSinc...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 124.33460664749146,
+      "error": null,
+      "timestamp": "2026-01-28T20:31:45.791358"
+    },
+    {
+      "run_id": "ef_2-creative-B-chunk_800_topk_1_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_800_topk_1_window1_docs5_document",
+      "retriever_config": {
+        "name": "chunk_800_topk_1_window1_docs5_document",
+        "chunk_size": 800,
+        "top_k": 1,
+        "expand": 1,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood:\n\n1. **Determine applicable deductible percentage**:\n   From CT MAPS Homeowner Rules Manual (page 23), properties located in Coastline Neighborhoods greater than 2,500 feet from the coast will receive a 2% Hurricane deductible.\n\n2. **Find deductible factor for HO3 policy with 2% deductible**:\n   The deductible factor for an HO3 policy with...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 121.69680166244507,
+      "error": null,
+      "timestamp": "2026-01-28T20:33:47.498302"
+    },
+    {
+      "run_id": "ef_2-creative-B-chunk_400_topk_5_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_400_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_5_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I need to follow these steps:\n\n1. **Find base rate for $750,000 coverage limit**: Based on Exhibit 19 of the CT Homeowners MAPS Rate Pages (page 162), the relevant section is not provided directly; however, for HO3 policies with Coverage A limits, the deduction to find the applicable rate comes from tables that match Coverage D's table st...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 10,
+        "total": 60,
+        "score": 60
+      },
+      "execution_time": 125.56222987174988,
+      "error": null,
+      "timestamp": "2026-01-28T20:35:53.073452"
+    },
+    {
+      "run_id": "ef_2-creative-B-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "creative",
+      "variant": "B",
+      "config_name": "chunk_400_topk_3_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.9,
+        "top_k": 80,
+        "top_p": 0.95,
+        "repeat_penalty": 1.0,
+        "seed": 43
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit:\n\n1. Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages:\nThe relevant table from Exhibit 19 of CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162) shows the percentage of Base Coverage for HO3 policies with different Coverage A limits:\n* 30.00%: No match\n* 40.01%: No match\n* However, there is a table on page 80 that lists the Policy Form and Coverage A Limit:\n    * H...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 168.19055104255676,
+      "error": null,
+      "timestamp": "2026-01-28T20:38:41.290269"
+    },
+    {
+      "run_id": "ef_2-precision-A-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_400_topk_3_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_document",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need:\n\n1. Base Rate: Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages.\n   [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\n   Exhibit 19\n   Policy Form\n   Coverage D \n   Percentage of \n   Base Coverage \n   Minimum\n   Coverage D \n   Percentage of \n   Base Coverage \n   Maximum\n   Fire Water Non-\n   Weather Water Weather Wind/Hail Hurr...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 0,
+        "total": 50,
+        "score": 50
+      },
+      "execution_time": 194.40478801727295,
+      "error": null,
+      "timestamp": "2026-01-28T20:41:55.729954"
+    },
+    {
+      "run_id": "ef_2-precision-A-chunk_2000_topk_1_wi",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_2000_topk_1_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_1_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 1,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, located 3,000 feet from the coast in a Coastline Neighborhood, we need to follow the multi-step calculation task outlined above.\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nFrom Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), we find that:\n\n* Coverage D is not directly applicable to our scenario, as we are looking for an HO3 policy.\n* However, we can see that there is a table w...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 129.5479917526245,
+      "error": null,
+      "timestamp": "2026-01-28T20:44:05.308884"
+    },
+    {
+      "run_id": "ef_2-precision-A-chunk_800_topk_1_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_800_topk_1_window1_docs5_document",
+      "retriever_config": {
+        "name": "chunk_800_topk_1_window1_docs5_document",
+        "chunk_size": 800,
+        "top_k": 1,
+        "expand": 1,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I will follow the steps below:\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nAccording to Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), there is no specific table or exhibit that lists rates for $750,000 coverage limits. However, we can infer from the table headers and row/column labels that the rates are based on a ...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 137.06589889526367,
+      "error": null,
+      "timestamp": "2026-01-28T20:46:22.387022"
+    },
+    {
+      "run_id": "ef_2-precision-A-chunk_400_topk_5_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_400_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_5_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, located 3,000 feet from the coast in a Coastline Neighborhood, we need to follow the multi-step calculation task outlined above.\n\n**Step 1: Find base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages**\n\nAccording to Exhibit 19 of the CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162), there is no specific information provided for a $750,000 Coverage A limit. However, we can fin...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 140.83504104614258,
+      "error": null,
+      "timestamp": "2026-01-28T20:48:43.244223"
+    },
+    {
+      "run_id": "ef_2-precision-A-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "A",
+      "config_name": "chunk_400_topk_3_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.0,
+        "top_k": 1,
+        "top_p": 1.0,
+        "repeat_penalty": 1.2,
+        "seed": 123
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need:\n\n1. Base Rate: Find the base rate for $750,000 coverage limit in Homeowners MAPS Rate Pages.\n   [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\n   Exhibit 19\n   Policy Form\n   Coverage D \n   Percentage of \n   Base Coverage \n   Minimum\n   Coverage D \n   Percentage of \n   Base Coverage \n   Maximum\n   Fire Water Non-\n   Weather Water Weather Wind/Hail Hurr...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 0,
+        "total": 50,
+        "score": 50
+      },
+      "execution_time": 191.33820700645447,
+      "error": null,
+      "timestamp": "2026-01-28T20:51:54.616428"
+    },
+    {
+      "run_id": "ef_2-precision-B-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_400_topk_3_window0_docs5_document",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_document",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need:\n\n1. Base Rate for $750,000 coverage limit in Homeowners MAPS Rate Pages:\n   [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\n   Exhibit 19\n   Policy Form\n   Coverage D \n   Percentage of \n   Base Coverage \n   Minimum\n   Coverage D \n   Percentage of \n   Base Coverage \n   Maximum\n   Fire Water Non-\n   Weather Water Weather Wind/Hail Hurricane Liability Othe...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 15,
+        "base_rate_id": 5,
+        "factor_id": 5,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 198.91165494918823,
+      "error": null,
+      "timestamp": "2026-01-28T20:55:13.561873"
+    },
+    {
+      "run_id": "ef_2-precision-B-chunk_2000_topk_1_wi",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_2000_topk_1_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_2000_topk_1_window0_docs5_page",
+        "chunk_size": 2000,
+        "top_k": 1,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, located 3,000 feet from the coast in a Coastline Neighborhood, we need to follow the multi-step calculation task outlined above.\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nAccording to Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), there is no specific table or exhibit that lists rates for $750,000 coverage. However, we can infer that the rates are progressive and based on th...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 128.0396909713745,
+      "error": null,
+      "timestamp": "2026-01-28T20:57:21.634769"
+    },
+    {
+      "run_id": "ef_2-precision-B-chunk_800_topk_1_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_800_topk_1_window1_docs5_document",
+      "retriever_config": {
+        "name": "chunk_800_topk_1_window1_docs5_document",
+        "chunk_size": 800,
+        "top_k": 1,
+        "expand": 1,
+        "docs": 5,
+        "strategy": "document"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I will follow the steps below:\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nFrom Exhibit 19 of the Homeowners MAPS Rate Pages (page 162), I find that there is no specific base rate listed for $750,000 coverage. However, I notice that the rates increase as the coverage amount increases. Since the policy has a Coverage A limit o...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 139.2026071548462,
+      "error": null,
+      "timestamp": "2026-01-28T20:59:40.852483"
+    },
+    {
+      "run_id": "ef_2-precision-B-chunk_400_topk_5_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_400_topk_5_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_5_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 5,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit located 3,000 feet from the coast in a Coastline Neighborhood, I will follow the steps outlined below:\n\n**Step 1: Find base rate for $750,000 coverage limit**\n\nAccording to Exhibit 19 on page 162 of the CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf, there is no specific information for a $750,000 Coverage A limit. However, I found that for a $600,000 Coverage A limit, the base rate is $250 (Exhibi...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 113.00118565559387,
+      "error": null,
+      "timestamp": "2026-01-28T21:01:33.869141"
+    },
+    {
+      "run_id": "ef_2-precision-B-chunk_400_topk_3_win",
+      "question_id": "EF_2",
+      "track": "precision",
+      "variant": "B",
+      "config_name": "chunk_400_topk_3_window0_docs5_page",
+      "retriever_config": {
+        "name": "chunk_400_topk_3_window0_docs5_page",
+        "chunk_size": 400,
+        "top_k": 3,
+        "expand": 0,
+        "docs": 5,
+        "strategy": "page"
+      },
+      "decoding_params": {
+        "temperature": 0.2,
+        "top_k": 10,
+        "top_p": 0.9,
+        "repeat_penalty": 1.2,
+        "seed": 124
+      },
+      "answer": "To calculate the unadjusted Hurricane premium for an HO3 policy with a $750,000 Coverage A limit, I need:\n\n1. Base Rate for $750,000 coverage limit in Homeowners MAPS Rate Pages:\n   [1] (215004905-180407973)-CT Homeowners MAPS Rate Pages Eff 8.18.25 v3.pdf (page 162):\n   Exhibit 19\n   Policy Form\n   Coverage D \n   Percentage of \n   Base Coverage \n   Minimum\n   Coverage D \n   Percentage of \n   Base Coverage \n   Maximum\n   Fire Water Non-\n   Weather Water Weather Wind/Hail Hurricane Liability Othe...",
+      "scores": {
+        "document_retrieval": 20,
+        "deductible_id": 20,
+        "base_rate_id": 5,
+        "factor_id": 0,
+        "calculation": 10,
+        "total": 55,
+        "score": 55
+      },
+      "execution_time": 101.52482199668884,
+      "error": null,
+      "timestamp": "2026-01-28T21:03:15.411332"
+    }
+  ]
+}
